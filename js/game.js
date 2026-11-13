@@ -13,7 +13,8 @@ function fit(){const s=document.getElementById('screen');const sc=Math.max(.5,Ma
  const w=Math.floor(W*sc),h=Math.floor(H*sc);s.style.width=w+'px';s.style.height=h+'px';cv.style.width=w+'px';cv.style.height=h+'px';}
 addEventListener('resize',fit,{passive:true});addEventListener('orientationchange',()=>setTimeout(fit,140));
 const K=IN.st,KE={},PREV={};
-function pollInput(){for(const k in K){const v=K[k]?1:0;if(v&&!PREV[k])KE[k]=true;PREV[k]=v;}}
+function pollInput(){for(const k in K){const v=K[k]?1:0;if(v&&!PREV[k])KE[k]=true;PREV[k]=v;
+ if(IN.edge&&IN.edge[k]){KE[k]=true;IN.edge[k]=0;}}}
 function eat(k){if(KE[k]){KE[k]=false;return true;}return false;}
 function peek(k){return !!KE[k];}
 function clearEdges(){for(const k in KE)KE[k]=false;}
@@ -33,7 +34,7 @@ const layers=new Map();
 function layer(key,w,h,fn){let c=layers.get(key);if(c)return c;c=document.createElement('canvas');c.width=w;c.height=h;
  const old=g;try{bind(c.getContext('2d'));fn();}finally{bind(old);}layers.set(key,c);return c;}
 const glows=new Map();
-function glowSpr(c,r){const k=c+'|'+r;let s=glows.get(k);if(s)return s;const d=r*2,cn=document.createElement('canvas');cn.width=d;cn.height=d;
+function glowSpr(c,r){r=Math.max(2,(r|0)&~1);const k=c+'|'+r;let s=glows.get(k);if(s)return s;const d=r*2,cn=document.createElement('canvas');cn.width=d;cn.height=d;
  const x=cn.getContext('2d');const gr=x.createRadialGradient(r,r,0,r,r,r);gr.addColorStop(0,c);gr.addColorStop(1,'rgba(0,0,0,0)');
  x.fillStyle=gr;x.beginPath();x.arc(r,r,r,0,6.2832);x.fill();glows.set(k,cn);return cn;}
 function glow(x,y,r,c,a){const s=glowSpr(c,Math.max(2,r|0));g.globalAlpha=a==null?.5:a;g.drawImage(s,(x-r)|0,(y-r)|0);g.globalAlpha=1;}
@@ -44,10 +45,15 @@ function Pool(make){const free=[],live=[];return{live,get(){const o=free.pop()||
  sweep(){for(let i=live.length-1;i>=0;i--)if(live[i].dead){free.push(live[i]);live.splice(i,1);}},
  clear(){while(live.length)free.push(live.pop());},get count(){return live.length;}};}
 const pBul=Pool(()=>({})),pEbul=Pool(()=>({})),pPart=Pool(()=>({})),pTxt=Pool(()=>({})),pFlame=Pool(()=>({})),pItem=Pool(()=>({})),pMover=Pool(()=>({})),pWarn=Pool(()=>({}));
-const MAXPART=220,CELL=40,grid=new Map();
-function gridBuild(list){grid.clear();for(let i=0;i<list.length;i++){const f=list[i];if(f.dead)continue;
- const x0=Math.floor(f.x/CELL),x1=Math.floor((f.x+f.w)/CELL),y0=Math.floor(f.y/CELL),y1=Math.floor((f.y+f.h)/CELL);
- for(let cy=y0;cy<=y1;cy++)for(let cx=x0;cx<=x1;cx++){const k=cx*8192+cy;let a=grid.get(k);if(!a){a=[];grid.set(k,a);}a.push(f);}}}
+const MAXPART=140,CELL=40,grid=new Map(),gridUsed=[];
+function gridBuild(list){
+ for(let i=0;i<gridUsed.length;i++)gridUsed[i].length=0;
+ gridUsed.length=0;
+ for(let i=0;i<list.length;i++){const f=list[i];if(f.dead)continue;
+  const x0=Math.floor(f.x/CELL),x1=Math.floor((f.x+f.w)/CELL),y0=Math.floor(f.y/CELL),y1=Math.floor((f.y+f.h)/CELL);
+  for(let cy=y0;cy<=y1;cy++)for(let cx=x0;cx<=x1;cx++){const k=cx*8192+cy;
+   let a=grid.get(k);if(!a){a=[];grid.set(k,a);}
+   if(a.length===0)gridUsed.push(a);a.push(f);}}}
 const gridAt=(x,y)=>grid.get(Math.floor(x/CELL)*8192+Math.floor(y/CELL))||null;
 function spark(x,y,n,c,p){for(let i=0;i<n;i++){if(pPart.count>=MAXPART)return;const a=rnd(0,6.283),s=rnd(.6,p||3.2),o=pPart.get();
  o.x=x;o.y=y;o.vx=Math.cos(a)*s;o.vy=Math.sin(a)*s-.5;o.life=o.max=rnd(12,30)|0;o.c=c||P.yl1;o.g=.12;o.s=1;o.kind=0;}}
@@ -152,7 +158,7 @@ function updPlayer(){const p=pl;if(!p)return;p.px=p.x;p.py=p.y;if(p.dead){deadT+
  else{const top=c.speed*(p.webT>0?.45:1)*(p.prone?0:1);
   if(p.prone)p.vx*=.6;else if(K.left&&!K.right)p.vx=Math.max(-top,p.vx-ACC);else if(K.right&&!K.left)p.vx=Math.min(top,p.vx+ACC);
   else{p.vx*=p.onGround?FRIC:.94;if(Math.abs(p.vx)<.06)p.vx=0;}}
- if(eat('jump'))p.buf=8;if(p.buf>0)p.buf--;if(p.coyote>0)p.coyote--;
+ if(eat('jump'))p.buf=12;if(p.buf>0)p.buf--;if(p.coyote>0)p.coyote--;
  const ccx=Math.floor((p.x+p.w/2)/TS),ccy=Math.floor((p.y+p.h+1)/TS),onPlat=plt(ccx,ccy)&&!sol(ccx,ccy);
  if(p.buf>0&&p.onGround&&K.down&&onPlat){p.drop=12;p.y+=2;p.vy=1.6;p.buf=0;p.onGround=false;setProne(p,false);SND.play('jump');}
  else if(p.buf>0){if(p.onGround||p.coyote>0){setProne(p,false);p.vy=-c.jump*1.12;p.onGround=false;p.jumps=1;p.buf=0;p.coyote=0;p.jcut=true;p.groundMover=null;
@@ -404,6 +410,7 @@ function drawFoe(f,alpha){let frame=0;
  if(f.def.kind==='ground'){if(f.hide>0)frame=0;else if(f.moving)frame=1+((f.anim|0)%2);else frame=0;}else frame=(f.anim|0)%2;
  const spr=GFX.foe(f.def.spr||f.type,f.v,frame,f.face<0);if(!spr)return;
  const ix=lerp(f.px,f.x,alpha),iy=lerp(f.py,f.y,alpha),cx=Math.round(ix-cam.x+f.w/2),feet=Math.round(iy+f.h);
+ if(cx<-40||cx>W+40)return;
  const dx=cx-(spr.width>>1),dy=feet-spr.height,flashOn=f.hitT>0&&(tick>>1)%2;
  if(flashOn)g.globalAlpha=.55;g.drawImage(spr,dx,dy);g.globalAlpha=1;
  if(flashOn){g.globalCompositeOperation='lighter';g.globalAlpha=.4;g.drawImage(spr,dx,dy);g.globalAlpha=1;g.globalCompositeOperation='source-over';}
@@ -511,8 +518,12 @@ function drawBoss(){const b=boss;if(!b)return;const X=Math.round(b.x-cam.x),Y=Ma
   txtCSh('ВНИМАНИЕ',W/2,102,P.rd2,3);txtCSh(b.def.name,W/2,128,P.yl2,2);txtCSh(b.def.sub,W/2,146,P.g4,1);g.globalAlpha=1;}}
 function drawSky(){if(skyCv)g.drawImage(skyCv,0,0);
  if(lvl.theme!=='lair')for(let i=0;i<5;i++){const x=((i*113-tick*.12)%560+560)%560-50;ell(x,30+i*11,24,6,'rgba(255,255,255,.12)');}}
-function drawPar(cx){const f=-(cx*.18)%896,m=-(cx*.42)%896;
- if(farCv){g.drawImage(farCv,f|0,0);g.drawImage(farCv,(f+896)|0,0);}if(midCv){g.drawImage(midCv,m|0,0);g.drawImage(midCv,(m+896)|0,0);}}
+function drawPar(cx){
+ const strip=(cv,shift)=>{if(!cv)return;let sx=((shift%896)+896)%896;const w=Math.min(W,896-sx);
+  g.drawImage(cv,sx,0,w,H,0,0,w,H);
+  if(w<W)g.drawImage(cv,0,0,W-w,H,w,0,W-w,H);};
+ strip(farCv,cx*.18);strip(midCv,cx*.42);
+}
 function drawTiles(cx){const sx=clamp(cx|0,0,Math.max(0,lvl.w*TS-W));if(tileCv)g.drawImage(tileCv,sx,0,W,H,0,0,W,H);
  const o=(tick>>3)%4,x0=Math.floor(sx/TS);
  for(let x=x0;x<x0+30;x++)for(let y=13;y<16;y++)if(T(x,y)==='~'){const X=x*TS-sx,Y=y*TS;
@@ -520,7 +531,7 @@ function drawTiles(cx){const sx=clamp(cx|0,0,Math.max(0,lvl.w*TS-W));if(tileCv)g
   if(y===13){px(X,Y,TS,1,th.foam);for(let i=0;i<3;i++)dot(X+((x*3+i*5+o)%14),Y-1,2,th.foam);}}}
 function drawWeather(){if(!th.weather||!rainCv)return;const sp=th.weather==='rain'?7:1.1,ox=(tick*sp*.4)%224,oy=(tick*sp)%256;
  g.globalAlpha=th.weather==='rain'?.85:.7;
- for(let i=-1;i<3;i++)for(let j=-1;j<2;j++)g.drawImage(rainCv,(i*224-ox)|0,(j*256+oy)|0);
+ for(let i=0;i<3;i++)for(let j=0;j<2;j++)g.drawImage(rainCv,(i*224-ox)|0,(j*256-oy)|0);
  g.globalAlpha=1;if(th.fog){g.fillStyle=th.fog;g.fillRect(0,0,W,H);}}
 function drawHUD(){const p=pl;px(0,0,W,20,'rgba(7,10,16,.78)');px(0,20,W,1,P.d3);
  txtSh('СЧЁТ',5,2,P.g3,1);txtSh(String(score).padStart(7,'0'),5,11,P.w,1);
@@ -632,14 +643,38 @@ function render(alpha){bind(g);g.setTransform(1,0,0,1,0,0);g.globalAlpha=1;g.glo
  else if(lvl){drawSky();drawPar(cx);drawTiles(cx);drawMovers();drawWarnings();drawItems();
   for(let i=0;i<foes.length;i++)drawFoe(foes[i],alpha);
   if(boss)drawBoss();if(pl&&!pl.dead)drawChar(pl,alpha);
-  drawFlames();drawBullets(alpha);drawParts(alpha);drawWeather();drawHUD();
-  if(clearT>0){px(0,100,W,50,'rgba(7,10,16,.84)');px(0,100,W,2,P.yl2);px(0,148,W,2,P.yl2);
-   txtCSh('ЗОНА ЗАЧИЩЕНА',W/2,108,P.yl2,2);txtCSh('БОНУС '+BOSSES[lvl.boss].score,W/2,132,P.cy2,1);}
-  if(paused)drawPause();}
- else drawTitle();
- g.restore();
- if(flash>0){g.fillStyle='rgba(255,255,255,'+(flash/12).toFixed(2)+')';g.fillRect(0,0,W,H);}
- vis.drawImage(buf,0,0,W,H);}
+  const ebCache=new Map(),flCache=new Map();
+function ebSpr(col,r){const k=col+'|'+r;let s=ebCache.get(k);if(s)return s;
+ const d=(r+2)*2,c=document.createElement('canvas');c.width=d;c.height=d;
+ const old=g;try{bind(c.getContext('2d'));ellO(r+2,r+2,r+1,r+1,col,P.n);ell(r+2,r+2,Math.max(1,r-1),Math.max(1,r-1),P.w);}finally{bind(old);}
+ ebCache.set(k,c);return c;}
+function flSpr(r){r=Math.max(2,r|0);let s=flCache.get(r);if(s)return s;
+ const d=r*2+4,c=document.createElement('canvas');c.width=d;c.height=d;const cx=r+2,cy=r+2;
+ const old=g;try{bind(c.getContext('2d'));ell(cx,cy,r,r*.8,P.fl3);ell(cx,cy,r*.6,r*.5,P.fl2);ell(cx,cy,r*.3,r*.25,P.fl1);}finally{bind(old);}
+ flCache.set(r,c);return c;}
+function drawFlames(){const fl=pFlame.live;
+ for(let i=0;i<fl.length;i++){const o=fl[i];if(o.dead)continue;
+  const X=o.x-cam.x;if(X<-30||X>W+30)continue;
+  const a=o.life/o.max,s=flSpr(o.r);
+  g.globalAlpha=Math.min(1,a*1.3);g.drawImage(s,(X-s.width/2)|0,(o.y-s.height/2)|0);g.globalAlpha=1;
+  glow(X,o.y,o.r*2,'rgba(255,106,26,.4)',.5*a);}}
+function drawBullets(alpha){const bl=pBul.live;
+ for(let i=0;i<bl.length;i++){const b=bl[i];if(b.dead)continue;
+  const X=lerp(b.px,b.x,alpha)-cam.x,Y=lerp(b.py,b.y,alpha);
+  if(X<-40||X>W+40)continue;
+  if(b.kind==='laser'){const a=Math.atan2(b.vy,b.vx),tx=X-Math.cos(a)*b.len,ty=Y-Math.sin(a)*b.len;
+   beam(tx,ty,X,Y,P.cy4,6);beam(tx,ty,X,Y,P.cy2,4);beam(tx,ty,X,Y,P.cy1,2);glow(X,Y,9,'rgba(53,224,255,.6)',.6);}
+  else if(b.kind==='fire'){const s=flSpr(6);g.drawImage(s,(X-8)|0,(Y-8)|0);glow(X,Y,12,'rgba(255,106,26,.55)',.6);}
+  else if(b.kind==='homing'){const s=ebSpr(P.pu2,3);g.drawImage(s,(X-5)|0,(Y-5)|0);glow(X,Y,8,'rgba(217,179,255,.5)',.5);}
+  else{const a=Math.atan2(b.vy,b.vx);beam(X-Math.cos(a)*b.len,Y-Math.sin(a)*b.len,X,Y,b.col,3);dot(X-1,Y-1,2,P.w);}}
+ const el=pEbul.live;
+ for(let i=0;i<el.length;i++){const b=el[i];if(b.dead)continue;
+  const X=lerp(b.px,b.x,alpha)-cam.x,Y=lerp(b.py,b.y,alpha);
+  if(X<-40||X>W+40)continue;
+  if(b.fire){const s=flSpr(b.r+2);g.drawImage(s,(X-s.width/2)|0,(Y-s.height/2)|0);glow(X,Y,b.r*3,'rgba(255,106,26,.5)',.6);}
+  else if(b.web){for(let k=0;k<6;k++)beam(X-b.r,Y-b.r+k*2,X+b.r,Y-b.r+k*2,'rgba(255,255,255,.8)',1);
+   beam(X-b.r,Y-b.r,X+b.r,Y+b.r,'rgba(255,255,255,.8)',1);}
+  else{const s=ebSpr(b.col,b.r);g.drawImage(s,(X-s.width/2)|0,(Y-s.height/2)|0);glow(X,Y,b.r*2,'rgba(255,163,42,.35)',.4);}}}
 function drawErr(){bind(g);g.setTransform(1,0,0,1,0,0);g.globalAlpha=1;
  px(0,H-26,W,26,'rgba(40,4,4,.94)');px(0,H-26,W,1,P.rd2);
  txtSh('СБОЙ: '+String(err).slice(0,68),4,H-22,P.rd1,1);txtSh('НАЖМИ СТАРТ ДЛЯ СБРОСА',4,H-12,P.g3,1);
