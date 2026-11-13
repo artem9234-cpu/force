@@ -22,7 +22,6 @@ const P={
  cy1:'#d4fbff',cy2:'#35e0ff',cy3:'#1a93b8',cy4:'#0d5570',
  mt1:'#cdd8e6',mt2:'#93a3ba',mt3:'#63728a',mt4:'#3d4759',mt5:'#242c3a',
  fl1:'#fff0c0',fl2:'#ffb020',fl3:'#ff6a1a',fl4:'#c23a08',
- // Новые цвета для скелетной анимации и детализированных тайлов
  skinL:'#ffd9a8', skinM:'#f0b878', skinD:'#c98a4e',
  clothL:'#5aaee0', clothM:'#2a6fb0', clothD:'#17416e',
  pantsL:'#7a88ff', pantsM:'#4a55d0', pantsD:'#2a3080',
@@ -71,13 +70,16 @@ function glow(cx,cy,r,c,a){
  G.fillStyle=gr;G.beginPath();G.arc(cx,cy,r,0,6.2832);G.fill();G.restore();}
 function hash(x,y){let h=(x*374761393+y*668265263)|0;h=((h^(h>>>13))*1274126177)|0;
  return ((h^(h>>>16))>>>0)/4294967296;}
+
+// === УЛУЧШЕННЫЙ ШРИФТ ===
 const F={' ':[0,0,0,0,0,0,0]};
 (function buildFont(){
  const CH='ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'+
           '0123456789.,:;!?’\'"/?\\%()<>[]{}*+-=¬_¬|#@&$^~`№§°±×÷';
  let t=null,x=null;
  try{t=document.createElement('canvas');x=t.getContext('2d',{willReadFrequently:true});}catch(e){return;}
- const FS=44,FNT='900 '+FS+'px "Arial Black",Arial,monospace,sans-serif';
+ // Используем жирный моноширинный шрифт
+ const FS=28, FNT='bold '+FS+'px monospace, Arial';
  for(const ch of CH){
   try{
    x.font=FNT;
@@ -85,7 +87,7 @@ const F={' ':[0,0,0,0,0,0,0]};
    const h=Math.ceil(FS*1.25);
    t.width=w;t.height=h;
    x.font=FNT;x.textBaseline='alphabetic';x.fillStyle='#fff';
-   x.fillText(ch,1,FS*0.92);
+   x.fillText(ch,1,FS*0.85);
    const d=x.getImageData(0,0,w,h).data;
    const rows=[];
    for(let r=0;r<7;r++){
@@ -95,7 +97,8 @@ const F={' ':[0,0,0,0,0,0,0]};
      const y0=Math.floor(r*h/7),y1=Math.max(y0+1,Math.floor((r+1)*h/7));
      let acc=0,cnt=0;
      for(let yy=y0;yy<y1;yy++)for(let xx=x0;xx<x1;xx++){acc+=d[(yy*w+xx)*4+3];cnt++;}
-     if(cnt&&(acc/cnt)>62)bits|=(1<<(4-c));
+     // Порог 30 вместо 62 делает буквы толще и понятнее
+     if(cnt&&(acc/cnt)>30)bits|=(1<<(4-c));
     }
     rows.push(bits);
    }
