@@ -1,179 +1,350 @@
-/* ============================================================
-   GFX v17 — пиксельные карты из прямоугольников.
-   Человек 16×28: голова/торс/длинные ноги/оружие в руках.
-   Кадры запекаются в canvas. Никаких простыней символов.
-   ============================================================ */
+/* GFX v19 — подробные пиксель-спрайты 40×32 / 36×14. */
 const GFX=(()=>{
 'use strict';
-const {bind,px}=CORE;
+const {bind,px,line,ell}=CORE;
 function blank(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;return c;}
 function flipC(c){const f=blank(c.width,c.height),x=f.getContext('2d');
  x.translate(c.width,0);x.scale(-1,1);x.drawImage(c,0,0);return f;}
 function make(w,h,fn){const c=blank(w,h);const ctx=c.getContext('2d');bind(ctx);fn(ctx);return c;}
+function R(list,c){for(const r of list)px(r[0],r[1],r[2],r[3],c);}
 const PALS={
- antony:{o:'#0b0e15',s:'#f0b878',S:'#c07840',h:'#ffd9a8',p:'#2a6fb0',P:'#17416e',q:'#5aa8e0',b:'#5a300c',B:'#331a04',r:'#c22a22',y:'#c79a00',g:'#5b6a80',G:'#cdd8e6',v:'#8a5a28',V:'#c08848',a:'#ffd400'},
- artyom:{o:'#0b0e15',s:'#e0a870',S:'#a87038',h:'#f8c890',p:'#3d4759',P:'#242c3a',q:'#63728a',b:'#1d2536',B:'#0d1220',r:'#ff4a3d',y:'#ffa32a',g:'#4a5568',G:'#93a3ba',v:'#8a2a20',V:'#c24838',a:'#ffa32a'},
- den:{o:'#0b0e15',s:'#ffd9a8',S:'#d8a068',h:'#fff3d8',p:'#17416e',P:'#0d2440',q:'#2a6fb0',b:'#2a3448',B:'#141c2c',r:'#35e0ff',y:'#35e0ff',g:'#3d4759',G:'#93a3ba',v:'#1a6a78',V:'#35a0b0',a:'#35e0ff'},
- dimka:{o:'#0b0e15',s:'#f0b878',S:'#c07840',h:'#ffd9a8',p:'#3d1668',P:'#240b40',q:'#6a2bb0',b:'#1d2536',B:'#0d1220',r:'#a24bff',y:'#e0c2ff',g:'#0d5570',G:'#35e0ff',v:'#4a4a5e',V:'#7a7a92',a:'#a24bff'}};
-const GEAR={antony:{head:'bandana',chest:'bare',back:0},artyom:{head:'helmet',chest:'plate',back:1},
- den:{head:'hood',chest:'light',back:0},dimka:{head:'goggles',chest:'exo',back:2}};
-function R(x,list,c){for(const r of list)px(x,r[0],r[1],r[2],r[3],c);}
-function head(x,pal,g){
- if(g.head==='bandana'){R(x,[[4,0,8,2],[3,1,2,3],[2,3,2,2]],pal.r);R(x,[[4,2,8,4]],pal.s);
-  R(x,[[5,2,3,2]],pal.h);px(x,9,3,1,1,pal.o);R(x,[[6,5,4,1]],pal.S);}
- else if(g.head==='helmet'){R(x,[[3,0,10,3]],pal.v);R(x,[[4,1,8,1]],pal.V);
-  R(x,[[5,3,7,2]],pal.g);R(x,[[6,3,4,1]],pal.G);R(x,[[5,5,6,1]],pal.s);}
- else if(g.head==='hood'){R(x,[[3,0,10,6]],pal.v);R(x,[[4,1,8,4]],pal.V);
-  R(x,[[6,2,5,4]],pal.s);px(x,9,3,1,1,pal.o);}
- else{R(x,[[4,0,8,2]],pal.p);R(x,[[3,2,10,2]],pal.g);R(x,[[4,2,4,1],[9,2,3,1]],pal.a);
-  R(x,[[5,4,6,2]],pal.s);px(x,9,4,1,1,pal.o);}
-}
-function torso(x,pal,g){
- const base=g.chest==='bare'?pal.s:(g.chest==='plate'?pal.v:pal.p);
- const hi=g.chest==='bare'?pal.h:(g.chest==='plate'?pal.V:pal.q);
- const lo=g.chest==='bare'?pal.S:(g.chest==='plate'?pal.v:pal.P);
- R(x,[[3,6,10,2],[4,8,8,4]],base);R(x,[[5,8,3,2]],hi);R(x,[[4,11,8,1]],lo);
- if(g.chest==='bare'){R(x,[[5,9,6,1],[7,10,1,2]],pal.S);}
- if(g.chest==='plate'){R(x,[[5,8,6,1]],pal.V);R(x,[[7,9,2,3]],pal.a);}
- if(g.chest==='light'){R(x,[[7,6,1,6]],pal.P);R(x,[[4,10,8,1]],pal.a);}
- if(g.chest==='exo'){R(x,[[4,8,8,1],[4,11,8,1]],pal.P);R(x,[[6,9,4,2]],pal.a);}
- if(g.back===1){R(x,[[1,7,2,6]],pal.P);R(x,[[1,8,1,4]],pal.q);}
- if(g.back===2){R(x,[[1,7,2,6]],pal.P);R(x,[[1,8,1,2],[1,11,1,2]],pal.a);}
- R(x,[[4,12,8,2]],pal.y);R(x,[[7,12,2,2]],pal.G);
-}
+ antony:{o:'#0a0e15',s:'#f0b878',S:'#b87838',h:'#ffd9a8',
+   hair:'#1a0a00',cloth:'#2a6fb0',clothHi:'#5aaee0',clothLo:'#17416e',
+   boots:'#3a2010',bootHi:'#5a3820',accent:'#ff4a3d',accHi:'#ff8870'},
+ artyom:{o:'#0a0e15',s:'#e8a870',S:'#b07038',h:'#f8c890',
+   hair:'#3a1a08',cloth:'#4a5568',clothHi:'#7a8898',clothLo:'#242c3a',
+   boots:'#1a1a1a',bootHi:'#3a3a3a',accent:'#ffa32a',accHi:'#ffd070'},
+ den:{o:'#0a0e15',s:'#ffd9a8',S:'#c89868',h:'#ffe8c0',
+   hair:'#0a1a28',cloth:'#17416e',clothHi:'#35a0b0',clothLo:'#0d2440',
+   boots:'#1a1a2a',bootHi:'#3a3a5a',accent:'#35e0ff',accHi:'#a0f0ff'},
+ dimka:{o:'#0a0e15',s:'#f0b878',S:'#b87838',h:'#ffd9a8',
+   hair:'#3d1668',cloth:'#3d1668',clothHi:'#6a2bb0',clothLo:'#240b40',
+   boots:'#2a2a3a',bootHi:'#4a4a6a',accent:'#a24bff',accHi:'#e0c2ff'}};
+const GEAR={antony:'bandana',artyom:'helmet',den:'hood',dimka:'goggles'};
+const POSES={
+ idle:{legs:'stand',arms:'F_low',headDy:0,lean:0},
+ run0:{legs:'runA',arms:'F_low',headDy:0,lean:1},
+ run1:{legs:'runB',arms:'F_low',headDy:0,lean:1},
+ run2:{legs:'runC',arms:'F_low',headDy:0,lean:1},
+ run3:{legs:'runD',arms:'F_low',headDy:0,lean:1},
+ jump:{legs:'tuck',arms:'F_hi',headDy:-1,lean:1},
+ fall:{legs:'spread',arms:'F_hi',headDy:-1,lean:0},
+ aimF:{legs:'stand',arms:'F',headDy:0,lean:0},
+ aimU:{legs:'stand',arms:'U',headDy:0,lean:0},
+ aimD:{legs:'stand',arms:'D',headDy:0,lean:0},
+ aimDU:{legs:'stand',arms:'DU',headDy:0,lean:0},
+ aimDD:{legs:'stand',arms:'DD',headDy:0,lean:0}};
 const LEGS={
- idle:{L:[[4,14,3,8],[4,22,3,4]],LB:[3,26,5,2],R:[[9,14,3,8],[9,22,3,4]],RB:[8,26,5,2]},
- run0:{L:[[3,14,3,6],[2,20,3,6]],LB:[1,26,5,2],R:[[9,14,3,6],[10,20,3,6]],RB:[9,26,5,2]},
- run1:{L:[[5,14,3,8],[5,22,3,4]],LB:[4,26,5,2],R:[[8,14,3,8],[8,22,3,4]],RB:[7,26,5,2]},
- run2:{L:[[9,14,3,6],[10,20,3,6]],LB:[9,26,5,2],R:[[3,14,3,6],[2,20,3,6]],RB:[1,26,5,2]},
- run3:{L:[[4,14,3,5],[3,19,3,4]],LB:[2,23,5,2],R:[[9,14,3,8],[9,22,3,4]],RB:[8,26,5,2]},
- jump:{L:[[3,14,3,5],[2,19,3,4]],LB:[1,23,5,2],R:[[9,14,3,5],[10,19,3,4]],RB:[9,23,5,2]},
- fall:{L:[[3,14,3,7],[2,21,3,5]],LB:[1,26,5,2],R:[[10,14,3,7],[11,21,3,5]],RB:[10,26,5,2]}};
-function legs(x,pal,key){
- const f=LEGS[key]||LEGS.idle;
- R(x,f.L,pal.p);R(x,[f.L[1]],pal.P);R(x,[f.LB],pal.b);R(x,[[f.LB[0],f.LB[1],f.LB[2],1]],pal.B);
- R(x,f.R,pal.p);R(x,[f.R[1]],pal.P);R(x,[f.RB],pal.b);R(x,[[f.RB[0],f.RB[1],f.RB[2],1]],pal.B);
-}
+ stand:{lh:[16,19],lk:[15,24],lf:[13,29],rh:[24,19],rk:[25,24],rf:[27,29]},
+ runA:{lh:[16,19],lk:[11,22],lf:[8,27],rh:[24,19],rk:[28,22],rf:[31,28]},
+ runB:{lh:[16,19],lk:[15,23],lf:[14,29],rh:[24,19],rk:[25,23],rf:[25,29]},
+ runC:{lh:[16,19],lk:[28,22],lf:[31,27],rh:[24,19],rk:[11,22],rf:[8,28]},
+ runD:{lh:[16,19],lk:[18,24],lf:[14,30],rh:[24,19],rk:[25,23],rf:[28,30]},
+ tuck:{lh:[16,19],lk:[12,22],lf:[16,26],rh:[24,19],rk:[28,22],rf:[31,26]},
+ spread:{lh:[16,19],lk:[11,23],lf:[8,28],rh:[24,19],rk:[29,23],rf:[31,28]}};
 const ARMS={
- F:{a:[[8,8,6,3]],g:[[12,9,4,2]],gh:[[12,9,4,1]],gr:[[11,11,2,2]],tip:[16,10]},
- U:{a:[[8,4,3,5]],g:[[9,0,2,5]],gh:[[9,0,1,5]],gr:[[8,9,2,2]],tip:[10,0]},
- DU:{a:[[8,6,5,3]],g:[[11,4,2,2],[13,2,2,2]],gh:[[11,4,2,1]],gr:[[10,9,2,2]],tip:[15,2]},
- DD:{a:[[8,10,5,3]],g:[[11,12,2,2],[13,14,2,2]],gh:[[11,12,2,1]],gr:[[10,11,2,2]],tip:[15,16]},
- D:{a:[[8,10,3,5]],g:[[9,15,2,5]],gh:[[9,15,1,5]],gr:[[8,10,2,2]],tip:[10,20]}};
-function arm(x,pal,aim){
- const a=ARMS[aim]||ARMS.F;
- R(x,a.a,pal.s);R(x,a.g,pal.g);R(x,a.gh,pal.G);R(x,a.gr,pal.o);
- return a.tip;
-}
+ F_low:{sx:25,sy:14,ex:29,ey:15,hx:32,hy:15,aim:'F'},
+ F_hi:{sx:25,sy:13,ex:29,ey:11,hx:32,hy:10,aim:'F'},
+ F:{sx:25,sy:14,ex:29,ey:14,hx:32,hy:14,aim:'F'},
+ U:{sx:25,sy:13,ex:26,ey:9,hx:25,hy:6,aim:'U'},
+ D:{sx:25,sy:14,ex:26,ey:18,hx:25,hy:21,aim:'D'},
+ DU:{sx:25,sy:13,ex:29,ey:10,hx:33,hy:8,aim:'DU'},
+ DD:{sx:25,sy:14,ex:29,ey:17,hx:33,hy:19,aim:'DD'}};
 const TIPS={};
-function soldier(x,pal,g,pose){
+function drawHead(p,gear,pose){
+ const dy=POSES[pose].headDy;
+ R([[16,3+dy,8,6]],p.s);
+ R([[16,3+dy,8,1]],p.h);
+ R([[16,8+dy,8,1]],p.S);
+ R([[18,6+dy,1,1]],p.o);
+ R([[21,6+dy,1,1]],p.o);
+ if(gear==='bandana'){
+  R([[15,2+dy,10,2]],p.accent);
+  R([[15,2+dy,10,1]],p.accHi);
+  R([[15,4+dy,1,2]],p.accent);
+  R([[16,8+dy,1,1]],p.accent);
+ }else if(gear==='helmet'){
+  R([[15,2+dy,10,3]],p.clothHi);
+  R([[16,2+dy,8,1]],p.accHi);
+  R([[15,5+dy,10,1]],p.clothLo);
+  R([[15,2+dy,1,4]],p.clothLo);
+  R([[24,2+dy,1,4]],p.clothLo);
+ }else if(gear==='hood'){
+  R([[15,2+dy,10,3]],p.cloth);
+  R([[16,3+dy,8,2]],p.clothHi);
+  R([[15,2+dy,1,6]],p.clothLo);
+  R([[24,2+dy,1,6]],p.clothLo);
+  R([[16,9+dy,8,1]],p.clothLo);
+ }else if(gear==='goggles'){
+  R([[15,3+dy,10,2]],p.cloth);
+  R([[16,3+dy,3,2]],p.accHi);
+  R([[21,3+dy,3,2]],p.accHi);
+  R([[15,3+dy,1,2]],p.clothLo);
+  R([[24,3+dy,1,2]],p.clothLo);}}
+function drawTorso(p,gear,pose){
+ const lean=POSES[pose].lean,ox=lean?1:0;
+ R([[14-ox,9,12,9]],p.cloth);
+ R([[14-ox,9,12,1]],p.clothHi);
+ R([[14-ox,16,12,2]],p.clothLo);
+ if(gear==='bandana'||gear==='hood'){
+  R([[17-ox,10,6,4]],p.s);
+  R([[15-ox,10,2,6]],p.clothLo);
+  R([[23-ox,10,2,6]],p.clothLo);
+  R([[19-ox,11,2,3]],p.S);
+ }else if(gear==='helmet'){
+  R([[15-ox,10,10,5]],p.clothHi);
+  R([[17-ox,11,6,3]],p.clothLo);
+  R([[19-ox,9,2,7]],p.accent);
+  R([[19-ox,14,2,2]],p.accHi);
+ }else if(gear==='goggles'){
+  R([[14-ox,10,1,7]],p.clothHi);
+  R([[25-ox,10,1,7]],p.clothHi);
+  R([[17-ox,10,6,4]],p.clothLo);
+  R([[18-ox,11,4,2]],p.accent);}
+ R([[14-ox,17,12,1]],p.boots);
+ R([[19-ox,17,2,1]],p.accHi);}
+function drawLegs(p,legsKey){
+ const L=LEGS[legsKey]||LEGS.stand;
+ line(L.lh[0],L.lh[1],L.lk[0],L.lk[1],p.o,5);
+ line(L.lk[0],L.lk[1],L.lf[0],L.lf[1],p.o,4);
+ line(L.rh[0],L.rh[1],L.rk[0],L.rk[1],p.o,5);
+ line(L.rk[0],L.rk[1],L.rf[0],L.rf[1],p.o,4);
+ line(L.lh[0],L.lh[1],L.lk[0],L.lk[1],p.clothLo,3);
+ line(L.lk[0],L.lk[1],L.lf[0],L.lf[1],p.clothLo,2);
+ line(L.rh[0],L.rh[1],L.rk[0],L.rk[1],p.clothLo,3);
+ line(L.rk[0],L.rk[1],L.rf[0],L.rf[1],p.clothLo,2);
+ line(L.lh[0],L.lh[1]-1,L.lk[0],L.lk[1]-1,p.cloth,1);
+ line(L.rh[0],L.rh[1]-1,L.rk[0],L.rk[1]-1,p.cloth,1);
+ R([[L.lf[0]-2,L.lf[1]-2,5,3]],p.boots);
+ R([[L.rf[0]-2,L.rf[1]-2,5,3]],p.boots);
+ R([[L.lf[0]-2,L.lf[1]-2,5,1]],p.bootHi);
+ R([[L.rf[0]-2,L.rf[1]-2,5,1]],p.bootHi);}
+function drawWeapon(hx,hy,aim){
+ let dx=0,dy=0;
+ if(aim==='F'){dx=8;dy=0;}
+ else if(aim==='U'){dx=0;dy=-6;}
+ else if(aim==='D'){dx=0;dy=6;}
+ else if(aim==='DU'){dx=5;dy=-5;}
+ else if(aim==='DD'){dx=5;dy=5;}
+ const tx=hx+dx,ty=hy+dy;
+ line(hx,hy,tx,ty,'#0a0a15',4);
+ line(hx,hy,tx,ty,'#4a4a5e',3);
+ line(hx,hy-1,tx,ty-1,'#8a8a9a',1);
+ ell(tx,ty,2,2,'#2a2a3a');
+ ell(tx,ty,1,1,'#c0c0d0');
+ return [tx,ty];}
+function drawArms(p,armKey){
+ const A=ARMS[armKey]||ARMS.F;
+ line(A.sx,A.sy,A.ex,A.ey,p.o,4);
+ line(A.ex,A.ey,A.hx,A.hy,p.o,3);
+ line(A.sx,A.sy,A.ex,A.ey,p.s,3);
+ line(A.ex,A.ey,A.hx,A.hy,p.s,2);
+ line(A.sx,A.sy-1,A.ex,A.ey-1,p.h,1);
+ ell(A.hx,A.hy,2,2,p.S);
+ return drawWeapon(A.hx,A.hy,A.aim);}
+function soldier(p,gear,pose){
  if(pose==='prone'){
-  R(x,[[2,4,12,4]],pal.p);R(x,[[2,4,12,1]],pal.q);R(x,[[0,6,4,3]],pal.b);
-  R(x,[[14,2,6,5]],pal.s);
-  if(g.head==='bandana')R(x,[[14,1,6,2]],pal.r);
-  if(g.head==='helmet')R(x,[[14,1,6,2]],pal.v);
-  if(g.head==='hood')R(x,[[13,1,7,5]],pal.v);
-  if(g.head==='goggles'){R(x,[[14,1,6,2]],pal.p);R(x,[[15,3,5,2]],pal.g);}
-  R(x,[[18,4,6,2]],pal.g);R(x,[[18,4,6,1]],pal.G);
-  TIPS.prone=[24,5];return;
- }
- const legKey=(pose==='idle'||pose==='aimU'||pose==='aimDU'||pose==='aimDD')?'idle':pose;
- legs(x,pal,legKey);
- torso(x,pal,g);
- head(x,pal,g);
- const aim=(pose==='aimU')?'U':(pose==='aimDU')?'DU':(pose==='aimDD')?'DD':'F';
- TIPS[pose]=arm(x,pal,aim);
-}
-const POSES=['idle','run0','run1','run2','run3','jump','fall','prone','aimU','aimDU','aimDD'];
+  R([[2,6,10,8]],p.clothLo);
+  R([[2,6,10,1]],p.cloth);
+  line(4,9,10,8,p.o,4);line(4,9,10,8,p.clothLo,3);
+  line(4,12,10,11,p.o,4);line(4,12,10,11,p.clothLo,3);
+  R([[2,11,3,3]],p.boots);
+  R([[12,4,14,10]],p.cloth);
+  R([[12,4,14,1]],p.clothHi);
+  R([[12,13,14,1]],p.clothLo);
+  R([[16,7,4,3]],p.s);
+  R([[25,3,9,7]],p.s);
+  R([[25,3,9,1]],p.h);
+  R([[27,6,1,1]],p.o);
+  if(gear==='bandana'){R([[24,1,10,2]],p.accent);R([[24,1,10,1]],p.accHi);}
+  else if(gear==='helmet'){R([[24,1,10,3]],p.clothHi);R([[25,1,8,1]],p.accHi);}
+  else if(gear==='hood'){R([[24,1,10,3]],p.cloth);R([[25,2,8,2]],p.clothHi);}
+  else if(gear==='goggles'){R([[24,2,10,2]],p.cloth);R([[27,2,2,2]],p.accHi);R([[31,2,2,2]],p.accHi);}
+  line(22,8,28,8,p.o,4);line(22,8,28,8,p.s,3);
+  drawWeapon(28,8,'F');
+  TIPS.prone=[36,9];
+  return;}
+ drawLegs(p,POSES[pose].legs);
+ drawTorso(p,gear,pose);
+ drawHead(p,gear,pose);
+ const tip=drawArms(p,POSES[pose].arms);
+ TIPS[pose]=tip;}
 const A={chars:{},foes:{}};
+const POSES_LIST=['idle','run0','run1','run2','run3','jump','fall','aimF','aimU','aimD','aimDU','aimDD','prone'];
 function buildChar(id){
- const pal=PALS[id],g=GEAR[id],set={};
- POSES.forEach(ps=>{
-  const w=(ps==='prone')?24:16,h=(ps==='prone')?10:28;
-  const c=make(w,h,x=>soldier(x,pal,g,ps));
-  set[ps]={r:c,l:flipC(c)};
- });
- A.chars[id]=set;
-}
-const EV=[{u:'#478a2c',U:'#2c5e1c',r:'#2c5e1c',b:'#331a04',s:'#c98a4e'},
- {u:'#8a5a28',U:'#5a3818',r:'#5a3818',b:'#331a04',s:'#c98a4e'},
- {u:'#20485a',U:'#0f2838',r:'#0f2838',b:'#1d2536',s:'#c98a4e'}];
-function enemy(x,type,v,fr){
- const p=Object.assign({o:'#0b0e15',g:'#5b6a80',G:'#cdd8e6',y:'#c79a00',f:'#ffb020',e:'#ff4a3d'},EV[v%3]);
- if(type==='flamer'){p.u='#8a2a20';p.U='#4a120c';p.r='#4a120c';}
- if(type==='sniper'){p.u='#0d5570';p.U='#071628';p.r='#1a93b8';}
- if(type==='gunner'){p.u='#4a4a5e';p.U='#2a2a3a';p.r='#2a2a3a';}
- if(type==='grenadier'){p.u='#5a3818';p.U='#3a2410';p.r='#3a2410';}
- if(type==='bird'||type==='flyer'){
-  const w=fr%2?3:-2;
-  R(x,[[4,4,12,5]],p.u);R(x,[[5,5,8,2]],p.U);
-  R(x,[[1,3+w,4,3],[15,3-w,4,3]],p.U);
-  R(x,[[7,5,4,2]],p.e);R(x,[[7,9,2,3],[11,9,2,3]],p.f);return;
- }
- if(type==='turret'||type==='bunker'){
-  R(x,[[2,8,16,10]],p.g);R(x,[[3,9,14,2]],p.G);
-  R(x,[[5,4,10,5]],p.g);R(x,[[6,5,6,2]],p.G);
-  R(x,[[12,6,8,3]],p.g);R(x,[[7,5,4,2]],p.e);
-  if(type==='bunker')for(let k=0;k<4;k++){R(x,[[2+k*4,16,4,3]],'#7a6a48');R(x,[[2+k*4,16,4,1]],'#9a8a68');}
-  return;
- }
- if(type==='crawler'){
-  R(x,[[2,4,14,5]],p.u);R(x,[[3,5,10,2]],p.U);
-  for(let i=0;i<5;i++){const s=(fr%2?1:-1)*(i%2?1:-1);R(x,[[3+i*3,9,2,3+s]],p.U);}
-  R(x,[[12,5,3,2]],p.e);return;
- }
- if(type==='jumper'){
-  R(x,[[3,2,10,9]],p.u);R(x,[[4,3,6,3]],p.U);
-  R(x,[[5,4,2,2],[9,4,2,2]],p.y);
-  R(x,[[4,11,3,5],[9,11,3,5]],p.U);R(x,[[3,16,4,2],[9,16,4,2]],p.b);return;
- }
- if(type==='pod'){
-  R(x,[[2,2,12,12]],p.G);R(x,[[3,3,10,8]],'#d4fbff');R(x,[[5,5,6,4]],p.U);R(x,[[6,6,3,2]],'#d4fbff');return;
- }
- const sw=fr%2?1:0;
- R(x,[[4+sw,12,3,7],[9-sw,12,3,7]],p.u);R(x,[[4+sw,17,3,3],[9-sw,17,3,3]],p.U);
- R(x,[[3+sw,19,4,2],[9-sw,19,4,2]],p.b);
- R(x,[[4,5,8,7]],p.u);R(x,[[5,6,6,3]],p.U);
- R(x,[[4,0,8,3]],p.r);R(x,[[5,3,6,3]],p.s);px(x,9,4,1,1,p.o);
- if(type==='gunner'){R(x,[[8,7,8,3]],p.g);R(x,[[10,5,4,2]],p.o);}
- else if(type==='flamer'){R(x,[[1,5,3,7]],p.f);R(x,[[8,7,7,2]],p.g);R(x,[[14,6,2,3]],p.f);}
- else if(type==='sniper'){R(x,[[8,7,12,2]],p.g);R(x,[[10,5,4,2]],p.G);}
- else if(type==='grenadier'){R(x,[[8,6,5,2]],p.g);R(x,[[12,3,3,3]],p.u);}
- else{R(x,[[8,7,8,2]],p.g);}
-}
+ const p=PALS[id],gear=GEAR[id],set={};
+ POSES_LIST.forEach(ps=>{
+  const w=ps==='prone'?36:40,h=ps==='prone'?14:32;
+  const c=make(w,h,()=>soldier(p,gear,ps));
+  set[ps]={r:c,l:flipC(c)};});
+ A.chars[id]=set;}
+const EF={
+ runner:{w:32,h:28,pal:['#5a3818','#2a1a08','#3a2010'],k:'grunt'},
+ shooter:{w:32,h:28,pal:['#3a5a3a','#1a2a1a','#2a4a2a'],k:'grunt'},
+ gunner:{w:32,h:28,pal:['#4a4a5e','#2a2a3a','#3a3a4e'],k:'grunt'},
+ flamer:{w:32,h:28,pal:['#8a2a20','#4a1208','#6a1a10'],k:'grunt'},
+ sniper:{w:32,h:28,pal:['#0d5570','#071628','#1a93b8'],k:'grunt'},
+ grenadier:{w:32,h:28,pal:['#5a3818','#3a2010','#4a2a10'],k:'grunt'},
+ jumper:{w:32,h:24,pal:['#3a5a3a','#1a2a1a','#2a4a2a'],k:'jumper'},
+ crawler:{w:32,h:18,pal:['#4a3a2a','#2a1a0a','#3a2a1a'],k:'crawler'},
+ bird:{w:32,h:20,pal:['#3a3a4a','#2a2a3a','#ff4a3d'],k:'flyer'},
+ flyer:{w:32,h:20,pal:['#3a3a4a','#2a2a3a','#35e0ff'],k:'flyer'},
+ turret:{w:32,h:24,pal:['#5a4a3a','#3a2a1a','#7a6a4a'],k:'turret'},
+ bunker:{w:32,h:24,pal:['#5a4a3a','#3a2a1a','#7a6a4a'],k:'turret'},
+ pod:{w:24,h:20,pal:['#a4e2ff','#2a6fb0','#e8f8ff'],k:'pod'}};
+function drawGrunt(ctx,pal,v,fr){
+ const o='#0a0e15',main=pal[0],dark=pal[1],hi=pal[2];
+ const skin='#e8a870',skinS='#b07038';
+ const L=LEGS[fr%2?'runA':'runB'];
+ line(L.lh[0],L.lh[1],L.lk[0],L.lk[1],o,5);
+ line(L.lk[0],L.lk[1],L.lf[0],L.lf[1],o,4);
+ line(L.rh[0],L.rh[1],L.rk[0],L.rk[1],o,5);
+ line(L.rk[0],L.rk[1],L.rf[0],L.rf[1],o,4);
+ line(L.lh[0],L.lh[1],L.lk[0],L.lk[1],dark,3);
+ line(L.lk[0],L.lk[1],L.lf[0],L.lf[1],dark,2);
+ line(L.rh[0],L.rh[1],L.rk[0],L.rk[1],dark,3);
+ line(L.rk[0],L.rk[1],L.rf[0],L.rf[1],dark,2);
+ R([[L.lf[0]-2,L.lf[1]-2,5,3]],'#1a1a1a');
+ R([[L.rf[0]-2,L.rf[1]-2,5,3]],'#1a1a1a');
+ R([[12,9,12,8]],main);
+ R([[12,9,12,1]],hi);
+ R([[12,15,12,2]],dark);
+ R([[12,17,12,1]],o);
+ R([[18,17,2,1]],'#ffd400');
+ R([[14,3,8,5]],skin);
+ R([[14,3,8,1]],'#ffd9a8');
+ R([[16,5,1,1]],o);
+ R([[20,5,1,1]],o);
+ R([[13,1,10,3]],dark);
+ R([[14,1,8,1]],hi);
+ R([[13,3,10,1]],'#1a1a1a');
+ line(24,12,29,13,o,4);
+ line(24,12,29,13,skin,3);
+ ell(29,13,2,2,skinS);
+ line(28,13,34,13,'#0a0a15',4);
+ line(28,13,34,13,'#4a4a5e',3);
+ line(28,12,34,12,'#8a8a9a',1);}
+function drawJumper(ctx,pal,v,fr){
+ const o='#0a0e15',main=pal[0],dark=pal[1],hi=pal[2],skin='#e8a870';
+ const dy=fr?-1:0;
+ R([[13,14+dy,4,8]],dark);
+ R([[19,14+dy,4,8]],dark);
+ R([[12,21+dy,5,3]],'#1a1a1a');
+ R([[18,21+dy,5,3]],'#1a1a1a');
+ R([[12,8+dy,12,7]],main);
+ R([[12,8+dy,12,1]],hi);
+ R([[14,2+dy,8,6]],skin);
+ R([[14,2+dy,8,1]],'#ffd9a8');
+ R([[16,4+dy,1,1]],o);
+ R([[20,4+dy,1,1]],o);
+ R([[13,0+dy,10,3]],dark);
+ R([[14,0+dy,8,1]],hi);
+ line(23,10+dy,30,10+dy,o,4);
+ line(23,10+dy,30,10+dy,'#4a4a5e',3);}
+function drawCrawler(ctx,pal,v,fr){
+ const o='#0a0e15',main=pal[0],dark=pal[1],hi=pal[2];
+ const wig=fr?1:-1;
+ R([[2,4,24,8]],o);
+ R([[3,5,22,6]],main);
+ R([[4,5,20,1]],hi);
+ R([[4,9,18,2]],dark);
+ for(let i=0;i<6;i++){
+  const lx=4+i*3,ly=11,off=(i%2?wig:-wig);
+  R([[lx,ly,2,4+off]],dark);
+  R([[lx-1,ly+4+off,4,2]],o);}
+ R([[16,7,2,2]],'#ff4a3d');
+ R([[21,7,2,2]],'#ff4a3d');
+ R([[16,7,1,1]],'#ffd0a8');
+ R([[21,7,1,1]],'#ffd0a8');}
+function drawFlyer(ctx,pal,v,fr){
+ const o='#0a0e15',main=pal[0],dark=pal[1],acc=pal[2];
+ const wf=fr%2?1:-1;
+ R([[8,8,18,8]],o);
+ R([[9,9,16,6]],main);
+ R([[10,9,14,1]],'#7a8a9a');
+ R([[10,13,14,1]],dark);
+ R([[2,6+wf*2,8,4]],dark);
+ R([[24,6-wf*2,8,4]],dark);
+ R([[2,6+wf*2,8,1]],main);
+ R([[24,6-wf*2,8,1]],main);
+ R([[12,11,3,2]],acc);
+ R([[18,11,3,2]],acc);
+ R([[13,11,1,1]],'#ffffff');
+ R([[19,11,1,1]],'#ffffff');
+ R([[13,15,6,2]],acc);
+ R([[14,17,4,1]],acc);}
+function drawTurret(ctx,pal,v,fr){
+ const o='#0a0e15',main=pal[0],dark=pal[1],hi=pal[2];
+ R([[4,14,24,8]],o);
+ R([[5,15,22,6]],main);
+ R([[5,15,22,1]],hi);
+ R([[5,19,22,2]],dark);
+ ell(16,12,9,7,o);
+ ell(16,12,8,6,main);
+ ell(15,11,5,3,hi);
+ const scan=Math.sin(fr*1.5)*2;
+ R([[11+scan,10,3,3]],'#ff4a3d');
+ R([[19-scan,10,3,3]],'#ff4a3d');
+ R([[12+scan,11,1,1]],'#ffffff');
+ R([[20-scan,11,1,1]],'#ffffff');
+ R([[14,4,4,10]],o);
+ R([[15,5,2,9]],dark);}
+function drawPod(ctx,pal,v,fr){
+ const o='#0a0e15',main=pal[0],dark=pal[1],hi=pal[2];
+ ell(12,10,11,10,dark);
+ ell(12,10,9,9,o);
+ ell(12,10,8,8,main);
+ ell(11,9,5,5,hi);
+ ell(12,10,3,3,'#ffd400');
+ ell(12,10,2,2,'#ffffff');}
+const KDRAW={grunt:drawGrunt,jumper:drawJumper,crawler:drawCrawler,flyer:drawFlyer,turret:drawTurret,pod:drawPod};
 function buildFoes(){
- ['runner','shooter','gunner','flamer','sniper','grenadier','rappeller','jumper','crawler','bird','flyer','turret','bunker','pod']
- .forEach(t=>{A.foes[t]=[];
+ for(const type in EF){
+  const spec=EF[type],arr=[];
   for(let v=0;v<3;v++){
-   const frames=[0,1,2].map(fr=>{const c=make(24,22,x=>enemy(x,t==='rappeller'?'gunner':t,v,fr));
-    return {r:c,l:flipC(c)};});
-   A.foes[t].push(frames);}});
-}
+   const frames=[];
+   for(let fr=0;fr<3;fr++){
+    const c=make(spec.w,spec.h,()=>KDRAW[spec.k](null,spec.pal,v,fr));
+    frames.push({r:c,l:flipC(c)});}
+   arr.push(frames);}
+  A.foes[type]=arr;}}
 let ready=false;
-function init(){if(ready)return;Object.keys(PALS).forEach(buildChar);buildFoes();ready=true;}
+function init(){if(ready)return;
+ for(const id in PALS)buildChar(id);
+ buildFoes();ready=true;}
 function poseOf(p){
  if(p.prone)return 'prone';
  if(!p.onGround)return p.vy<0?'jump':'fall';
- if(p.moving)return 'run'+((p.anim|0)%4);
+ if(p.moving)return 'run'+(((p.anim|0)%4+4)%4);
  const ak=p.aimKey||'F';
- if(ak==='U')return 'aimU';if(ak==='DU')return 'aimDU';if(ak==='DD')return 'aimDD';
- return 'idle';
-}
-function player(id,pose,left){const s=A.chars[id];if(!s)return null;const f=s[pose]||s.idle;return left?f.l:f.r;}
-function bodySprite(id,body,fr,left){let pose=body;if(body==='run'||body==='run0')pose='run'+(((fr|0)%4+4)%4);return player(id,pose,left);}
-function char(id){const s=A.chars[id];if(!s)return null;
- return {fr:{idle:[s.idle.r],run:[s.run0.r,s.run1.r,s.run2.r,s.run3.r],jump:[s.jump.r],fall:[s.fall.r],prone:s.prone.r},ar:[]};}
-function foe(type,v,frame,left){const set=A.foes[type];if(!set)return null;
- if(v===undefined)return set;const arr=set[(v|0)%3];if(!arr||!arr.length)return null;
- if(frame===undefined)return arr;const f=arr[((frame|0)%arr.length+arr.length)%arr.length];
+ if(ak==='U')return 'aimU';
+ if(ak==='DU')return 'aimDU';
+ if(ak==='DD')return 'aimDD';
+ if(ak==='D')return 'aimD';
+ if(ak==='F')return 'aimF';
+ return 'idle';}
+function player(id,pose,left){
+ const s=A.chars[id];if(!s)return null;
+ const f=s[pose]||s.idle;
+ return left?f.l:f.r;}
+function foe(type,v,frame,left){
+ const set=A.foes[type];if(!set)return null;
+ if(v===undefined)return set;
+ const arr=set[(v|0)%3];if(!arr)return null;
+ const f=arr[((frame|0)%arr.length+arr.length)%arr.length];
  return f?(left?f.l:f.r):null;}
-function tip(pose,left,sx,sy){const t=TIPS[pose]||TIPS.idle||[16,10];
- return {x:sx+(left?-(t[0]-8):(t[0]-8)),y:sy+(t[1]-14)};}
-function aimKey(a){if(!a)return 'F';const x=a.raw?a.raw.x:a.x,y=a.raw?a.raw.y:a.y;
- if(y<0)return x===0?'U':'DU';if(y>0)return x===0?'D':'DD';return 'F';}
-function armDraw(x,sx,sy){return {x:sx+8,y:sy+2};}
-function dirIndex(){return 0;}
-return {init,player,bodySprite,char,armDraw,foe,tip,aimKey,poseOf,dirIndex,POSES,TIPS,CW:16,CH:28,BUILD:18,get ready(){return ready;}};
+function tip(pose,left,sx,sy){
+ const t=TIPS[pose]||TIPS.aimF||[33,14];
+ const cw=pose==='prone'?36:40;
+ const ox=t[0]-cw/2;
+ return {x:sx+(left?-ox:ox),y:sy+(t[1]-14)};}
+function aimKey(a){
+ if(!a)return 'F';
+ const x=a.raw?a.raw.x:a.x,y=a.raw?a.raw.y:a.y;
+ if(y<0)return x===0?'U':'DU';
+ if(y>0)return x===0?'D':'DD';
+ return 'F';}
+return {init,player,foe,poseOf,tip,aimKey,BUILD:19,
+ get ready(){return ready;}};
 })();
 if(typeof window!=='undefined')window.GFX=GFX;
-/* EOF-GFX-17 */
