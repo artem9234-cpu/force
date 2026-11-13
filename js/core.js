@@ -1,4 +1,4 @@
-/* CORE v22 — ручной битмап-шрифт 5x7 (кириллица+латиница), звук, ввод */
+/* CORE v25 — битмап-шрифт 5x7, звук, ввод с защёлкой нажатия */
 const CORE=(()=>{
 'use strict';
 const W=448,H=256,TS=16;
@@ -37,7 +37,6 @@ function vgrad(x,y,w,h,c1,c2){for(let i=0;i<8;i++){const t=i/7,yy=y+Math.round(h
 function glow(cx,cy,r,c,a){G.save();G.globalAlpha=a==null?.5:a;const gr=G.createRadialGradient(cx,cy,0,cx,cy,r);
  gr.addColorStop(0,c);gr.addColorStop(1,'rgba(0,0,0,0)');G.fillStyle=gr;G.beginPath();G.arc(cx,cy,r,0,6.2832);G.fill();G.restore();}
 const hash=(x,y)=>{let h=(x*374761393+y*668265263)|0;h=((h^(h>>>13))*1274126177)|0;return ((h^(h>>>16))>>>0)/4294967296;};
-/* ---- РУЧНОЙ ШРИФТ 5x7 ---- */
 const F={
 ' ':[0,0,0,0,0,0,0],
 'А':[14,17,17,31,17,17,17],'Б':[31,16,16,30,17,17,30],'В':[30,17,17,30,17,17,30],'Г':[31,16,16,16,16,16,16],
@@ -76,7 +75,6 @@ function txt(s,x,y,c,sc){sc=sc||1;s=String(s).toUpperCase();G.fillStyle=c;
 const txtC=(s,cx,y,c,sc)=>txt(s,Math.round(cx-tw(s,sc)/2),y,c,sc);
 const txtSh=(s,x,y,c,sc,sh)=>{txt(s,x+1,y+1,sh||P.k,sc);txt(s,x,y,c,sc);};
 const txtCSh=(s,cx,y,c,sc,sh)=>{txtC(s,cx+1,y+1,sh||P.k,sc);txtC(s,cx,y,c,sc);};
-/* ---- ЗВУК ---- */
 const SND=(()=>{let ctx,mst,on=true,mg,seq,step=0,nextT=0,cur=null,bar=0;
  const NT={};(function(){const nm=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];for(let o=1;o<=7;o++)for(let i=0;i<12;i++)NT[nm[i]+o]=440*Math.pow(2,(i-9)/12+(o-4));})();
  const n=s=>typeof s==='number'?s:(NT[s]||0);
@@ -150,7 +148,6 @@ const SND=(()=>{let ctx,mst,on=true,mg,seq,step=0,nextT=0,cur=null,bar=0;
  return {unlock(){ensure();if(ctx&&ctx.state==='suspended')ctx.resume().catch(()=>{});},play(k){try{if(SFX[k])SFX[k]();}catch(e){}},
   music,tickMusic,set(v){on=!!v;if(ctx&&mst)mst.gain.value=on?.16:0;},get(){return on;},
   suspend(){if(ctx&&ctx.state==='running')ctx.suspend().catch(()=>{});},resume(){if(ctx&&ctx.state==='suspended')ctx.resume().catch(()=>{});}};})();
-/* ---- ВВОД ---- */
 const IN=(()=>{
  const st={left:0,right:0,up:0,down:0,fire:0,jump:0,spec:0,start:0};
  const edge={left:0,right:0,up:0,down:0,fire:0,jump:0,spec:0,start:0};
@@ -164,10 +161,8 @@ const IN=(()=>{
   if(!root)return;
   root.querySelectorAll('[data-k]').forEach(el=>{
    const k=el.dataset.k;
-   el.addEventListener('pointerdown',e=>{
-    e.preventDefault();SND.unlock();down(k);el.classList.add('on');
-    try{el.setPointerCapture(e.pointerId);}catch(_){}
-   },{passive:false});
+   el.addEventListener('pointerdown',e=>{e.preventDefault();SND.unlock();down(k);el.classList.add('on');
+    try{el.setPointerCapture(e.pointerId);}catch(_){}},{passive:false});
    const rel=e=>{if(e&&e.cancelable)e.preventDefault();up(k);el.classList.remove('on');};
    el.addEventListener('pointerup',rel,{passive:false});
    el.addEventListener('pointercancel',rel,{passive:false});
@@ -177,4 +172,6 @@ const IN=(()=>{
   addEventListener('blur',()=>{for(const k in st)st[k]=0;});
  }
  return {st,edge,bindDom,set:(k,v)=>{v?down(k):up(k);}};
+})();
+return {W,H,TS,P,clamp,rnd,ri,sgn,lerp,bind,px,box,ell,ellO,line,limb,tri,dith,vgrad,glow,hash,txt,txtC,tw,txtSh,txtCSh,SND,IN};
 })();
