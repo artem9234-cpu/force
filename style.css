@@ -69,4 +69,3 @@ body{
   .hint{display:none}
 }
 @media(min-width:900px){ .pad{width:min(680px,100%)} .bar{width:min(680px,100%)} }
-</style>
