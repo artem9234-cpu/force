@@ -1,4 +1,3 @@
-/* CORE v19 — база: палитра, рисование, шрифт, звук, ввод */
 const CORE=(()=>{
 'use strict';
 const W=448,H=256,TS=16;
@@ -23,8 +22,12 @@ const P={
  cy1:'#d4fbff',cy2:'#35e0ff',cy3:'#1a93b8',cy4:'#0d5570',
  mt1:'#cdd8e6',mt2:'#93a3ba',mt3:'#63728a',mt4:'#3d4759',mt5:'#242c3a',
  fl1:'#fff0c0',fl2:'#ffb020',fl3:'#ff6a1a',fl4:'#c23a08',
- fur1:'#d09050',fur2:'#a06028',fur3:'#703c14',fur4:'#482408',
- cat1:'#8888a8',cat2:'#5c5c78',cat3:'#38384c',cat4:'#20202e'};
+ // Новые цвета для скелетной анимации и детализированных тайлов
+ skinL:'#ffd9a8', skinM:'#f0b878', skinD:'#c98a4e',
+ clothL:'#5aaee0', clothM:'#2a6fb0', clothD:'#17416e',
+ pantsL:'#7a88ff', pantsM:'#4a55d0', pantsD:'#2a3080',
+ grassL:'#7ce85a', grassM:'#48c024', grassD:'#2a8010',
+ rockL:'#6a5a4a', rockM:'#3a2a1a', rockD:'#1a0a00'};
 let G=null;
 function bind(c){G=c;}
 function px(x,y,w,h,c){G.fillStyle=c;G.fillRect(x|0,y|0,Math.max(1,w|0),Math.max(1,h|0));}
@@ -68,7 +71,6 @@ function glow(cx,cy,r,c,a){
  G.fillStyle=gr;G.beginPath();G.arc(cx,cy,r,0,6.2832);G.fill();G.restore();}
 function hash(x,y){let h=(x*374761393+y*668265263)|0;h=((h^(h>>>13))*1274126177)|0;
  return ((h^(h>>>16))>>>0)/4294967296;}
-/* ---------- ШРИФТ ---------- */
 const F={' ':[0,0,0,0,0,0,0]};
 (function buildFont(){
  const CH='ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'+
@@ -110,7 +112,7 @@ function txt(s,x,y,c,sc){
 function txtC(s,cx,y,c,sc){txt(s,Math.round(cx-tw(s,sc)/2),y,c,sc);}
 function txtSh(s,x,y,c,sc,sh){txt(s,x+1,y+1,sh||P.k,sc);txt(s,x,y,c,sc);}
 function txtCSh(s,cx,y,c,sc,sh){txtC(s,cx+1,y+1,sh||P.k,sc);txtC(s,cx,y,c,sc);}
-/* ---------- ЗВУК ---------- */
+
 const SND=(()=>{
  let ctx=null,mst=null,on=true,mgain=null,seq=null,step=0,nextT=0,cur=null,bar=0;
  const NT={};
@@ -249,7 +251,6 @@ const SND=(()=>{
   suspend(){if(ctx&&ctx.state==='running')ctx.suspend().catch(()=>{});},
   resume(){if(ctx&&ctx.state==='suspended')ctx.resume().catch(()=>{});}};
 })();
-/* ---------- ВВОД ---------- */
 const IN=(()=>{
  const st={left:0,right:0,up:0,down:0,fire:0,jump:0,spec:0,start:0};
  const KEY={arrowleft:'left',a:'left',f:'left',arrowright:'right',d:'right',v:'right',
