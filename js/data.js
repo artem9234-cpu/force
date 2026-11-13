@@ -1,15 +1,19 @@
 /* ============================================================
    DATA — бойцы, оружие, враги, боссы, карты из сегментов
+   Самодостаточная палитра: работает с любой версией core.js
    ============================================================ */
 const DATA = (() => {
-const P = CORE.P;
+const P = Object.assign({}, CORE.P, {
+  cg1:'#7ce85a', cg2:'#48c024', cg3:'#2a8010', cg4:'#154a08',
+  cw1:'#7ce0ff', cw2:'#28a8f0', cw3:'#1064c0', cw4:'#083a80'
+});
 
 const CHARS = [
   { id:'antony', name:'ANTONY', role:'КОММАНДОС',
     hp:4, speed:2.0, jump:6.4, rate:1.0, dmg:1.0, weapon:'machine',
     dbl:true, dash:false, hover:false,
-    spec:'burst', specName:'ШКВАЛ', specDesc:'8 сек тройная скорострельность',
-    desc:'Бандана, голый торс, патронташ. Двойной прыжок, ровные показатели.',
+    spec:'burst', specName:'ШКВАЛ', specDesc:'8 СЕК ТРОЙНАЯ СКОРОСТРЕЛЬНОСТЬ',
+    desc:'БАНДАНА, ГОЛЫЙ ТОРС, ПАТРОНТАШ. ДВОЙНОЙ ПРЫЖОК, РОВНЫЕ ПОКАЗАТЕЛИ.',
     pal:{skin:P.sk2,skinHi:P.sk1,skinLo:P.sk3,pants:P.bl3,pantsHi:P.bl2,pantsLo:P.bl4,
          vest:P.br3,vestHi:P.br2,vestLo:P.br4,helm:P.rd2,helmHi:P.rd1,helmLo:P.rd3,
          boot:P.br4,bootHi:P.br3,gun:P.mt3,gunHi:P.mt1,acc:P.rd2},
@@ -18,8 +22,8 @@ const CHARS = [
   { id:'artyom', name:'ARTYOM', role:'ШТУРМ-ТАНК',
     hp:6, speed:1.5, jump:6.0, rate:.78, dmg:1.5, weapon:'fire',
     dbl:false, dash:true, hover:false,
-    spec:'quake', specName:'УДАР ЗЕМЛИ', specDesc:'Волна по земле сносит всё рядом',
-    desc:'Шлем с забралом, наплечники, пластина. Таран-рывок пробивает врагов.',
+    spec:'quake', specName:'УДАР ЗЕМЛИ', specDesc:'ВОЛНА ПО ЗЕМЛЕ СНОСИТ ВСЁ РЯДОМ',
+    desc:'ШЛЕМ С ЗАБРАЛОМ, НАПЛЕЧНИКИ, ПЛАСТИНА. ТАРАН-РЫВОК ПРОБИВАЕТ ВРАГОВ.',
     pal:{skin:P.sk2,skinHi:P.sk1,skinLo:P.sk3,pants:P.mt4,pantsHi:P.mt3,pantsLo:P.mt5,
          vest:P.rd3,vestHi:P.rd2,vestLo:P.rd4,helm:P.rd3,helmHi:P.rd2,helmLo:P.rd4,
          boot:P.d2,bootHi:P.d3,gun:P.mt2,gunHi:P.mt1,acc:P.or2},
@@ -28,8 +32,8 @@ const CHARS = [
   { id:'den', name:'DEN', role:'РАЗВЕДЧИК',
     hp:3, speed:2.55, jump:6.9, rate:1.4, dmg:.82, weapon:'spread',
     dbl:true, dash:true, hover:false,
-    spec:'blink', specName:'БЛИНК', specDesc:'Рывок сквозь врагов с уроном',
-    desc:'Капюшон, шарф, лёгкий жилет. Двойной прыжок и воздушный рывок.',
+    spec:'blink', specName:'БЛИНК', specDesc:'РЫВОК СКВОЗЬ ВРАГОВ С УРОНОМ',
+    desc:'КАПЮШОН, ШАРФ, ЛЁГКИЙ ЖИЛЕТ. ДВОЙНОЙ ПРЫЖОК И ВОЗДУШНЫЙ РЫВОК.',
     pal:{skin:P.sk1,skinHi:P.w,skinLo:P.sk2,pants:P.bl4,pantsHi:P.bl3,pantsLo:P.bl5,
          vest:P.cy4,vestHi:P.cy3,vestLo:P.bl5,helm:P.cy3,helmHi:P.cy2,helmLo:P.cy4,
          boot:P.d3,bootHi:P.g1,gun:P.mt1,gunHi:P.w,acc:P.cy2},
@@ -38,8 +42,8 @@ const CHARS = [
   { id:'dimka', name:'DIMKA', role:'ТЕХНИК',
     hp:4, speed:1.8, jump:6.2, rate:1.12, dmg:1.0, weapon:'laser',
     dbl:false, dash:false, hover:true,
-    spec:'drone', specName:'ДРОН', specDesc:'10 сек орбитальный дрон-помощник',
-    desc:'Визор, антенна, экзо-рамка. Парит на удержании прыжка, лазер пробивает.',
+    spec:'drone', specName:'ДРОН', specDesc:'10 СЕК ОРБИТАЛЬНЫЙ ДРОН-ПОМОЩНИК',
+    desc:'ВИЗОР, АНТЕННА, ЭКЗО-РАМКА. ПАРИТ НА УДЕРЖАНИИ ПРЫЖКА, ЛАЗЕР ПРОБИВАЕТ.',
     pal:{skin:P.sk2,skinHi:P.sk1,skinLo:P.sk3,pants:P.pu4,pantsHi:P.pu3,pantsLo:P.pu5,
          vest:P.mt3,vestHi:P.mt2,vestLo:P.mt4,helm:P.pu3,helmHi:P.pu2,helmLo:P.pu4,
          boot:P.d2,bootHi:P.d3,gun:P.cy4,gunHi:P.cy2,acc:P.pu1},
@@ -70,25 +74,20 @@ const ENEMIES = {
 };
 
 const BOSSES = [
-  {id:'dog',name:'КЕНДРИК',sub:'БУРЫЙ ПЁС · ОГНЕННАЯ ПАСТЬ',hp:170,w:116,h:72,score:5000,
+  {id:'dog',name:'КЕНДРИК',sub:'БУРЫЙ ПЁС - ОГНЕННАЯ ПАСТЬ',hp:170,w:116,h:72,score:5000,
    moves:['fireball','tail','charge','leap']},
-  {id:'cat',name:'АФИНА',sub:'КОШКА · ЛАЗЕРНЫЕ ГЛАЗА',hp:215,w:124,h:68,score:8000,
+  {id:'cat',name:'АФИНА',sub:'КОШКА - ЛАЗЕРНЫЕ ГЛАЗА',hp:215,w:124,h:68,score:8000,
    moves:['claw','eyebeam','pounce','volley']},
   {id:'spider',name:'АРАХНА',sub:'ФИНАЛЬНЫЙ УЖАС',hp:300,w:138,h:86,score:15000,
    moves:['web','legstab','drop','spawn','poison']}
 ];
 
-/* ---------- СЕГМЕНТЫ: 20 колонок, 13 воздушных строк + маска земли ----------
-   маска: # земля  ~ вода  ^ шипы  B мост над водой  . пропасть
-   спавн: P старт e бегун s стрелок t турель f летун j прыгун
-          g гренадёр c ползун n снайпер o под  B(в воздухе) ящик
-------------------------------------------------------------------------- */
 const E='....................';
 const SEG = {
   start:{a:[E,E,E,E,E,E,E,E,E,E,E,E,'..P.................'],g:'####################'},
   flat: {a:[E,E,E,E,E,E,E,E,E,E,E,E,'.....e........e.....'],g:'####################'},
   duo:  {a:[E,E,E,E,E,E,E,E,'.......=====........',E,E,E,'....s.......e.......'],g:'####################'},
-  gap3: {a:[E,E,E,E,E,E,E,E,E,E,E,'..........B.........'],g:'########...#########'},
+  gap3: {a:[E,E,E,E,E,E,E,E,E,E,E,'..........B.........',E],g:'########...#########'},
   gap5: {a:[E,E,E,E,E,E,E,E,E,'........=====.......',E,E,E],g:'######.....#########'},
   plat: {a:[E,E,'.........o..........',E,E,'.....======.........',E,E,'............=====...',E,E,E,'.......e............'],g:'####################'},
   turret:{a:[E,E,E,E,E,E,E,E,E,'..........=====.....',E,E,'.....t......s.......'],g:'####################'},
@@ -105,24 +104,28 @@ const SEG = {
   arena:{a:[E,E,E,E,E,E,E,E,E,E,E,E,E],g:'##############################'}
 };
 
+/* сборка с самовыравниванием: любая ошибка в длине сегмента не ломает карту */
 function build(list,theme,boss,name,sub){
-  const rows=[]; for(let i=0;i<16;i++) rows.push('');
+  const rows=[];for(let i=0;i<16;i++)rows.push('');
   list.forEach(k=>{
-    const s=SEG[k];
-    for(let r=0;r<13;r++) rows[r]+=s.a[r];
-    for(let r=13;r<16;r++){
-      let line='';
-      for(const ch of s.g){
-        if(ch==='#')line+='#';
-        else if(ch==='~')line+='~';
-        else if(ch==='^')line+=(r===13?'^':'#');
-        else if(ch==='B')line+=(r===13?'=':'~');
-        else line+='.';
-      }
-      rows[r]+=line;
+    const s=SEG[k];if(!s)return;
+    const w=s.g.length;
+    for(let r=0;r<13;r++){
+      const src=(s.a&&typeof s.a[r]==='string')?s.a[r]:'';
+      rows[r]+=(src+'.'.repeat(w)).slice(0,w);
     }
+    let g13='',g14='',g15='';
+    for(const ch of s.g){
+      if(ch==='#'){g13+='#';g14+='#';g15+='#';}
+      else if(ch==='~'){g13+='~';g14+='~';g15+='~';}
+      else if(ch==='^'){g13+='^';g14+='#';g15+='#';}
+      else if(ch==='B'){g13+='=';g14+='~';g15+='~';}
+      else {g13+='.';g14+='.';g15+='.';}
+    }
+    rows[13]+=g13;rows[14]+=g14;rows[15]+=g15;
   });
   const w=rows[0].length;
+  for(let r=0;r<16;r++)rows[r]=(rows[r]+'.'.repeat(w)).slice(0,w);
   return {rows,w,h:16,theme,boss,name,sub};
 }
 
