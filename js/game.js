@@ -1056,6 +1056,6 @@ function boot(){if(running)return;running=true;
  requestAnimationFrame(loop);}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
 else boot();
-window.__GAME_OK=true;
+window.__GAME_OK=true;window.__GAME_BUILD=18;
 })();
 /* EOF-GAME-17 */
