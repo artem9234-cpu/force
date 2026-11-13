@@ -1085,6 +1085,10 @@ function startGame(){lives=3;score=0;kills=0;pl=null;loadStage(0);}
 /* ---------- цикл ---------- */
 function update(){
   tick++;IN.poll();SND.tickMusic();
+  if(SVX.loaded()&&SVX.mode!==0&&!paused&&(state==='play'||state==='select'||state==='title')){
+    const st=(tick>>2)&15, br=(tick>>6)&3;
+    SVX.tick(st,br,null,null);
+  }
   if(comboT>0){comboT--;if(!comboT)combo=0;}
   if(flash>0)flash--;
   if(cam.shake>0)cam.shake*=.86;
@@ -1158,8 +1162,42 @@ function loop(now){
   render();
 }
 document.getElementById('bSound').addEventListener('click',e=>{
-  SND.unlock();SND.set(!SND.get());e.currentTarget.classList.toggle('off',!SND.get());
-  e.currentTarget.textContent=SND.get()?'🔊':'🔇';});
+  SND.unlock();SVX.unlock();
+  const on=!SND.get();
+  SND.set(on);SVX.setMuted(!on);
+  e.currentTarget.classList.toggle('off',!on);
+  e.currentTarget.textContent=on?'🔊':'🔇';});
+
+document.getElementById('bSvx').addEventListener('click',()=>{
+  SVX.unlock();document.getElementById('svxFile').click();});
+
+document.getElementById('svxFile').addEventListener('change',async e=>{
+  const f=e.target.files&&e.target.files[0];
+  e.target.value='';
+  if(!f)return;
+  const el=document.getElementById('svxInfo');
+  el.textContent='читаю '+f.name+'…';el.className='svx-info';
+  try{
+    SVX.unlock();
+    const m=await SVX.fromFile(f);
+    if(SVX.mode===0)SVX.cycleMode();
+    document.getElementById('bSvxMode').classList.add('on');
+    SVX.voice(261.63,Math.min(1.2,m.dur),1,0);
+    SND.play('pick');
+  }catch(err){
+    el.textContent='ошибка: '+(err&&err.message?err.message:err);
+    el.className='svx-info';
+    SND.play('hurt');
+  }
+});
+
+document.getElementById('bSvxMode').addEventListener('click',e=>{
+  SVX.unlock();
+  const m=SVX.cycleMode();
+  e.currentTarget.classList.toggle('on',SVX.mode!==0);
+  e.currentTarget.textContent=m;
+  if(SVX.loaded()&&SVX.mode!==0)SVX.voice(261.63,.3,.8,0);
+  SND.play('ui');});
 document.getElementById('bPause').addEventListener('click',()=>{if(state==='play'){paused=!paused;SND.play('ui');}});
 document.getElementById('bFull').addEventListener('click',()=>{
   const el=document.documentElement;
@@ -1167,7 +1205,9 @@ document.getElementById('bFull').addEventListener('click',()=>{
   else document.exitFullscreen();
   setTimeout(fit,220);});
 document.addEventListener('visibilitychange',()=>{
-  if(document.hidden){SND.suspend();if(state==='play')paused=true;}else SND.resume();});
+  if(document.hidden){SND.suspend();SVX.suspend();if(state==='play')paused=true;}
+  else {SND.resume();SVX.resume();}});
+SVX.paint();
 IN.bindDom(document.getElementById('pad'));
 SND.music('menu');fit();setTimeout(fit,120);
 requestAnimationFrame(loop);
