@@ -1,0 +1,72 @@
+:root{
+  --bg:#07090f; --panel:#111725; --line:#22304a;
+  --hot:#ff4a3d; --amber:#ffb020; --cyan:#35e0ff; --lime:#8dff4a;
+  --ink:#dfe9f5; --dim:#7d8ea8;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{
+  background:
+    radial-gradient(120% 80% at 50% -10%,#16203a 0%,#07090f 60%),
+    var(--bg);
+  color:var(--ink);overflow:hidden;overscroll-behavior:none;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Courier New",monospace;
+  -webkit-user-select:none;user-select:none;touch-action:none;
+}
+#app{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;
+  padding:calc(6px + env(safe-area-inset-top)) 6px calc(6px + env(safe-area-inset-bottom));gap:6px}
+
+.bezel{flex:1;min-height:0;width:100%;display:grid;place-items:center}
+.screen{position:relative;background:#000;border-radius:10px;overflow:hidden;
+  box-shadow:0 0 0 3px #1b2438,0 0 0 6px #0c1220,0 0 60px rgba(53,224,255,.16),0 24px 60px -20px #000}
+#cv{display:block;image-rendering:pixelated;image-rendering:crisp-edges}
+.scan{position:absolute;inset:0;pointer-events:none;opacity:.18;
+  background:repeating-linear-gradient(180deg,rgba(0,0,0,.85) 0 1px,transparent 1px 3px)}
+.glare{position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(122deg,rgba(255,255,255,.10) 0 14%,transparent 32%),
+             radial-gradient(130% 100% at 50% 118%,rgba(0,0,0,.5),transparent 58%)}
+
+.pad{display:flex;align-items:center;justify-content:space-between;width:min(560px,100%);
+  gap:10px;padding:2px 4px;flex:0 0 auto}
+.dpad{position:relative;width:132px;height:132px;flex:0 0 auto}
+.db{position:absolute;width:44px;height:44px;border:1px solid var(--line);border-radius:10px;
+  background:linear-gradient(180deg,#1d2740,#131b2c);color:#bcd0e8;font-size:15px;
+  display:grid;place-items:center;cursor:pointer;box-shadow:0 3px 0 #060a12,inset 0 1px 0 rgba(255,255,255,.12)}
+.db.up{left:44px;top:0}.db.down{left:44px;top:88px}
+.db.left{left:0;top:44px}.db.right{left:88px;top:44px}
+.dhub{position:absolute;left:44px;top:44px;width:44px;height:44px;border-radius:8px;
+  background:#0e1524;border:1px solid #1a2438}
+.db.on,.db:active{transform:translateY(3px);box-shadow:0 0 0 #060a12;
+  background:linear-gradient(180deg,#2b3d63,#1b2740);color:#fff}
+
+.acts{display:flex;align-items:center;gap:9px}
+.ab{width:60px;height:60px;border-radius:50%;border:1px solid var(--line);cursor:pointer;
+  display:grid;place-items:center;line-height:1;font-weight:900;font-size:17px;color:#0b0f18;
+  box-shadow:0 4px 0 #060a12,inset 0 2px 0 rgba(255,255,255,.45)}
+.ab small{display:block;font-size:7px;font-weight:800;letter-spacing:.06em;opacity:.72;margin-top:2px}
+.ab.fire{background:radial-gradient(70% 70% at 34% 26%,#ffd0a0,var(--hot))}
+.ab.jump{background:radial-gradient(70% 70% at 34% 26%,#d6ffc0,var(--lime));width:68px;height:68px}
+.ab.spec{background:radial-gradient(70% 70% at 34% 26%,#c8f2ff,var(--cyan));width:52px;height:52px;font-size:14px}
+.ab.on,.ab:active{transform:translateY(4px);box-shadow:0 0 0 #060a12}
+.ab[disabled]{opacity:.35;filter:grayscale(.7)}
+
+.bar{display:flex;align-items:center;gap:8px;width:min(560px,100%);flex:0 0 auto;padding:0 4px}
+.tb{width:34px;height:30px;border-radius:8px;border:1px solid var(--line);background:#141d2f;
+  color:var(--ink);font-size:14px;cursor:pointer}
+.tb:active{transform:scale(.94)}
+.tb.off{opacity:.45}
+.hint{flex:1;font-size:9px;color:var(--dim);letter-spacing:.02em;text-align:right;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+@media(max-width:420px){
+  .dpad{width:116px;height:116px}
+  .db{width:38px;height:38px}
+  .db.up{left:38px}.db.down{left:38px;top:78px}
+  .db.left{top:38px}.db.right{left:78px;top:38px}
+  .dhub{left:38px;top:38px;width:38px;height:38px}
+  .ab{width:52px;height:52px;font-size:15px}
+  .ab.jump{width:60px;height:60px}.ab.spec{width:46px;height:46px}
+  .hint{display:none}
+}
+@media(min-width:900px){ .pad{width:min(680px,100%)} .bar{width:min(680px,100%)} }
+</style>
