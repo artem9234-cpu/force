@@ -151,17 +151,30 @@ const SND=(()=>{let ctx,mst,on=true,mg,seq,step=0,nextT=0,cur=null,bar=0;
   music,tickMusic,set(v){on=!!v;if(ctx&&mst)mst.gain.value=on?.16:0;},get(){return on;},
   suspend(){if(ctx&&ctx.state==='running')ctx.suspend().catch(()=>{});},resume(){if(ctx&&ctx.state==='suspended')ctx.resume().catch(()=>{});}};})();
 /* ---- ВВОД ---- */
-const IN=(()=>{const st={left:0,right:0,up:0,down:0,fire:0,jump:0,spec:0,start:0};
+const IN=(()=>{
+ const st={left:0,right:0,up:0,down:0,fire:0,jump:0,spec:0,start:0};
+ const edge={left:0,right:0,up:0,down:0,fire:0,jump:0,spec:0,start:0};
  const KEY={arrowleft:'left',a:'left',f:'left',arrowright:'right',d:'right',v:'right',arrowup:'up',w:'up',arrowdown:'down',s:'down',y:'down',
   z:'fire',' ':'fire',j:'fire',x:'jump',k:'jump',c:'spec',l:'spec',shift:'spec',enter:'start',escape:'start',p:'start'};
- const set=(k,v)=>{if(k in st)st[k]=v?1:0;};
- addEventListener('keydown',e=>{const k=KEY[e.key.toLowerCase()];if(k){e.preventDefault();SND.unlock();set(k,1);}},{passive:false});
- addEventListener('keyup',e=>{const k=KEY[e.key.toLowerCase()];if(k){e.preventDefault();set(k,0);}},{passive:false});
- function bindDom(root){if(!root)return;root.querySelectorAll('[data-k]').forEach(el=>{const k=el.dataset.k;
-  el.addEventListener('pointerdown',e=>{e.preventDefault();SND.unlock();set(k,1);el.classList.add('on');},{passive:false});
-  ['pointerup','pointercancel','pointerleave'].forEach(ev=>el.addEventListener(ev,()=>{set(k,0);el.classList.remove('on');},{passive:false}));
-  el.addEventListener('contextmenu',e=>e.preventDefault());});
-  addEventListener('blur',()=>{for(const k in st)st[k]=0;});}
- return {st,bindDom,set};})();
-return {W,H,TS,P,clamp,rnd,ri,sgn,lerp,bind,px,box,ell,ellO,line,limb,tri,dith,vgrad,glow,hash,txt,txtC,tw,txtSh,txtCSh,SND,IN};
+ function down(k){if(!(k in st))return;if(!st[k])edge[k]=1;st[k]=1;}
+ function up(k){if(!(k in st))return;st[k]=0;}
+ addEventListener('keydown',e=>{const k=KEY[e.key.toLowerCase()];if(k){e.preventDefault();SND.unlock();down(k);}},{passive:false});
+ addEventListener('keyup',e=>{const k=KEY[e.key.toLowerCase()];if(k){e.preventDefault();up(k);}},{passive:false});
+ function bindDom(root){
+  if(!root)return;
+  root.querySelectorAll('[data-k]').forEach(el=>{
+   const k=el.dataset.k;
+   el.addEventListener('pointerdown',e=>{
+    e.preventDefault();SND.unlock();down(k);el.classList.add('on');
+    try{el.setPointerCapture(e.pointerId);}catch(_){}
+   },{passive:false});
+   const rel=e=>{if(e&&e.cancelable)e.preventDefault();up(k);el.classList.remove('on');};
+   el.addEventListener('pointerup',rel,{passive:false});
+   el.addEventListener('pointercancel',rel,{passive:false});
+   el.addEventListener('lostpointercapture',rel,{passive:false});
+   el.addEventListener('contextmenu',e=>e.preventDefault());
+  });
+  addEventListener('blur',()=>{for(const k in st)st[k]=0;});
+ }
+ return {st,edge,bindDom,set:(k,v)=>{v?down(k):up(k);}};
 })();
