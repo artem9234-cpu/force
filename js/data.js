@@ -1,4 +1,4 @@
-/* DATA v19 — бойцы, оружие, враги, боссы, уровни */
+/* DATA v20 */
 const DATA=(()=>{
 const P=Object.assign({},CORE.P,{});
 const CHARS=[
