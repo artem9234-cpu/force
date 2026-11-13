@@ -173,7 +173,7 @@ function aimKey(a){if(!a)return 'F';const x=a.raw?a.raw.x:a.x,y=a.raw?a.raw.y:a.
  if(y<0)return x===0?'U':'DU';if(y>0)return x===0?'D':'DD';return 'F';}
 function armDraw(x,sx,sy){return {x:sx+8,y:sy+2};}
 function dirIndex(){return 0;}
-return {init,player,bodySprite,char,armDraw,foe,tip,aimKey,poseOf,dirIndex,POSES,TIPS,CW:16,CH:28,get ready(){return ready;}};
+return {init,player,bodySprite,char,armDraw,foe,tip,aimKey,poseOf,dirIndex,POSES,TIPS,CW:16,CH:28,BUILD:18,get ready(){return ready;}};
 })();
 if(typeof window!=='undefined')window.GFX=GFX;
 /* EOF-GFX-17 */
