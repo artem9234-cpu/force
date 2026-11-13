@@ -5,24 +5,21 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#05070d">
 <title>BALBES FORCE</title>
-<link rel="stylesheet" href="style.css?v=15">
+<link rel="stylesheet" href="style.css?v=17">
 </head>
 <body>
 <div id="app">
   <div class="crt">
     <div class="screen" id="screen">
       <canvas id="cv" width="448" height="256"></canvas>
-      <div class="scan"></div>
-      <div class="vig"></div>
-      <div class="glare"></div>
-      <div class="dmg" id="dmg"></div>
-      <div class="power" id="power"></div>
+      <div class="scan"></div><div class="vig"></div><div class="glare"></div>
+      <div class="dmg" id="dmg"></div><div class="power" id="power"></div>
     </div>
   </div>
   <div class="float">
     <button id="bSound" class="fb" title="Звук">🔊</button>
     <button id="bPause" class="fb" title="Пауза">⏸</button>
-    <button id="bFull"  class="fb" title="Во весь экран">⛶</button>
+    <button id="bFull" class="fb" title="Во весь экран">⛶</button>
     <button id="bSvx" class="fb" title="Загрузить 8SVX/WAV">📁</button>
     <button id="bSvxMode" class="fb" title="Режим сэмпла">♫</button>
   </div>
@@ -30,9 +27,9 @@
   <div class="touch" id="touch">
     <div class="dpad" id="dpad">
       <span class="hub"></span>
-      <button class="dg up"    data-k="up"></button>
-      <button class="dg down"  data-k="down"></button>
-      <button class="dg left"  data-k="left"></button>
+      <button class="dg up" data-k="up"></button>
+      <button class="dg down" data-k="down"></button>
+      <button class="dg left" data-k="left"></button>
       <button class="dg right" data-k="right"></button>
     </div>
     <div class="abc">
@@ -44,11 +41,11 @@
   <div class="keys" id="keys">← → бег · ↑ прицел · ↓ лёжа · ↓+A спрыгнуть · B огонь · A прыжок · C приём · P пауза</div>
 </div>
 <input type="file" id="svxFile" accept=".8svx,.svx,.iff,.wav,.mp3,.ogg,.bin" hidden>
-<script src="js/core.js?v=15"></script>
-<script src="js/svx.js?v=15"></script>
-<script src="js/gfx.js?v=16"></script>
-<script src="js/data.js?v=15"></script>
-<script src="js/game.js?v=15"></script>
+<script src="js/core.js?v=17"></script>
+<script src="js/svx.js?v=17"></script>
+<script src="js/gfx.js?v=17"></script>
+<script src="js/data.js?v=17"></script>
+<script src="js/game.js?v=17"></script>
 <script>
 window.addEventListener('load',function(){
   var miss=[];
@@ -57,10 +54,8 @@ window.addEventListener('load',function(){
   if(typeof GFX==='undefined')miss.push('gfx.js');
   if(typeof SVX==='undefined')miss.push('svx.js');
   if(!window.__GAME_OK)miss.push('game.js');
-  if(miss.length){
-    var el=document.getElementById('svxInfo');
-    if(el){el.textContent='НЕ ЗАГРУЗИЛИСЬ: '+miss.join(', ');el.style.color='#ff4a3d';}
-  }
+  if(miss.length){var el=document.getElementById('svxInfo');
+    if(el){el.textContent='НЕ ЗАГРУЗИЛИСЬ: '+miss.join(', ');el.style.color='#ff4a3d';}}
 });
 </script>
 </body>
