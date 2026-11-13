@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#07090f">
+<title>BALBES FORCE</title>
+<link rel="stylesheet" href="style.css?v=1">
+</head>
+<body>
+<div id="app">
+  <div class="bezel">
+    <div class="screen" id="screen">
+      <canvas id="cv" width="320" height="224"></canvas>
+      <div class="scan"></div>
+      <div class="glare"></div>
+    </div>
+  </div>
+
+  <div class="pad" id="pad">
+    <div class="dpad">
+      <button class="db up"    data-k="up">▲</button>
+      <button class="db left"  data-k="left">◀</button>
+      <button class="db right" data-k="right">▶</button>
+      <button class="db down"  data-k="down">▼</button>
+      <span class="dhub"></span>
+    </div>
+    <div class="acts">
+      <button class="ab fire" data-k="fire">B<small>ОГОНЬ</small></button>
+      <button class="ab jump" data-k="jump">A<small>ПРЫЖОК</small></button>
+      <button class="ab spec" data-k="spec">S<small>ПРИЁМ</small></button>
+    </div>
+  </div>
+
+  <div class="bar">
+    <button id="bSound" class="tb">🔊</button>
+    <button id="bPause" class="tb">⏸</button>
+    <button id="bFull"  class="tb">⛶</button>
+    <span class="hint">← → бег · ↑ прицел вверх · ↓ лёжа · ↓+A спрыгнуть · Z огонь · X прыжок · C приём</span>
+  </div>
+</div>
+
+<script src="js/core.js?v=1"></script>
+<script src="js/data.js?v=1"></script>
+<script src="js/game.js?v=1"></script>
+</body>
+</html>
