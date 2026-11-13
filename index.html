@@ -5,7 +5,14 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#07090f">
 <title>BALBES FORCE</title>
-<link rel="stylesheet" href="style.css?v=3">
+<link rel="stylesheet" href="style.css?v=4">
+<style>
+.svx-info{flex:1;min-width:0;font-size:9px;color:#7d8ea8;letter-spacing:.02em;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}
+.svx-info.on{color:#8dff4a}
+.tb.svx{width:auto;padding:0 9px;font-size:11px;font-weight:800;letter-spacing:.04em}
+.tb.svx.on{border-color:#8dff4a;color:#8dff4a;background:rgba(141,255,74,.12)}
+</style>
 </head>
 <body>
 <div id="app">
@@ -16,6 +23,7 @@
       <div class="glare"></div>
     </div>
   </div>
+
   <div class="pad" id="pad">
     <div class="dpad">
       <button class="db up" data-k="up">▲</button>
@@ -30,15 +38,25 @@
       <button class="ab spec" data-k="spec">S<small>ПРИЁМ</small></button>
     </div>
   </div>
+
   <div class="bar">
     <button id="bSound" class="tb">🔊</button>
     <button id="bPause" class="tb">⏸</button>
     <button id="bFull" class="tb">⛶</button>
+    <button id="bSvx" class="tb svx" title="Загрузить 8SVX или WAV с диска">📁 8SVX</button>
+    <button id="bSvxMode" class="tb svx" title="Режим сэмпл-канала">РЕЖИМ</button>
+    <span class="svx-info" id="svxInfo">сэмпл не загружен</span>
+  </div>
+  <div class="bar">
     <span class="hint">← → бег · ↑ прицел вверх · ↓ лёжа · ↓+A спрыгнуть · Z огонь · X прыжок · C приём</span>
   </div>
 </div>
-<script src="js/core.js?v=3"></script>
-<script src="js/data.js?v=3"></script>
-<script src="js/game.js?v=3"></script>
+
+<input type="file" id="svxFile" accept=".8svx,.svx,.iff,.wav,.mp3,.ogg,.aiff,.bin" hidden>
+
+<script src="js/core.js?v=4"></script>
+<script src="js/svx.js?v=4"></script>
+<script src="js/data.js?v=4"></script>
+<script src="js/game.js?v=4"></script>
 </body>
 </html>
