@@ -211,32 +211,39 @@ function paintTile(x,y){
         GT=col(th.grassTuft,P.cg4),
         PL=col(th.plat,P.br3),PT=col(th.platTop,P.cg2),PE=col(th.platEdge,P.br5),
         MT=col(th.metal,P.mt3),MH=col(th.metalHi,P.mt1),ML=col(th.metalLo,P.mt5),
-        WA=col(th.water,P.cw3),W2=col(th.water2,P.cw2),W3=col(th.water3,P.cw1),FM=col(th.foam,P.w);
+        WA=col(th.water,P.cw3),W2=col(th.water2,P.cw2),W3=col(th.water3,P.cw1),FM=col(th.foam,P.w),
+        TR=col(th.tree,P.gr4),TRH=col(th.treeHi,P.gr2),TRL=col(th.treeLo,P.gr5),
+        TK=col(th.trunk,P.br4),TKH=col(th.trunkHi,P.br2),
+        HL=col(th.hill,P.gr3),HLH=col(th.hillHi,P.gr2),HLL=col(th.hillLo,P.gr4);
   if(c==='#'){
     px(X,Y,TS,TS,RO);
-    for(let i=0;i<3;i++){
+    for(let i=0;i<2;i++){
       const h1=hash(x*3+i,y*7),h2=hash(x*5+i,y*11);
-      const bx=X+3+h1*10,by=Y+4+h2*9,r=3.2+h1*2.4;
-      ell(bx,by,r+1,r*.85+1,RO);ell(bx,by,r,r*.85,RK);
-      ell(bx-r*.3,by-r*.3,r*.5,r*.35,RH);ell(bx+r*.3,by+r*.35,r*.45,r*.28,RL);
-      beam(bx-r*.4,by,bx+r*.2,by+r*.4,RC,1);
+      const bx=X+4+h1*8,by=Y+5+h2*8,r=4.5+h1*2.5;
+      ell(bx,by,r+1,r*.8+1,RO);ell(bx,by,r,r*.8,RK);
+      ell(bx-r*.32,by-r*.34,r*.52,r*.34,RH);ell(bx+r*.3,by+r*.36,r*.44,r*.26,RL);
+      beam(bx-r*.5,by-r*.1,bx+r*.1,by+r*.45,RC,1);
+      dot(bx+r*.2,by-r*.4,1,RH);
     }
-    for(let i=0;i<4;i++){const cx2=X+hash(x*9+i,y*3)*14,cy2=Y+6+hash(x*7+i,y*5)*8;
-      dot(cx2,cy2,1,RC);}
+    for(let i=0;i<5;i++){
+      const cx2=X+hash(x*9+i,y*3)*14,cy2=Y+6+hash(x*7+i,y*5)*8;
+      dot(cx2,cy2,1,RC);
+      if(hash(i,x+y)>0.7)dot(cx2+1,cy2+1,1,RL);
+    }
     if(!sol(x,y-1)&&T(x,y-1)!=='^'){
       px(X,Y,TS,5,GL);px(X,Y,TS,3,GR);px(X,Y,TS,1,GH);
       for(let i=0;i<6;i++){const gx=X+i*3+((x%2)?1:0),gh=2+((hash(x,i)*3)|0);
         px(gx,Y-gh,1,gh+2,GR);px(gx+1,Y-gh-1,1,gh+3,GH);px(gx+2,Y-1,1,2,GT);}
       px(X,Y+5,TS,1,GL);
       for(let i=0;i<3;i++)dot(X+2+i*5,Y+6,1,GT);
+      beam(X,Y+6,X+TS,Y+7,RL,1);
     }
     if(sol(x,y-1)){
       px(X,Y,TS,2,RL);
       for(let i=0;i<3;i++)dot(X+hash(x,i)*14,Y+2+hash(y,i)*4,1,RC);
     }
   } else if(c==='='){
-    px(X,Y,TS,7,MT);px(X,Y,TS,2,MH);px(X,Y+6,TS,1,ML);
-    px(X,Y+7,TS,1,P.n);
+    px(X,Y,TS,7,MT);px(X,Y,TS,2,MH);px(X,Y+6,TS,1,ML);px(X,Y+7,TS,1,P.n);
     for(let i=0;i<4;i++){px(X+i*5,Y+3,2,2,ML);px(X+i*5,Y+3,1,1,MH);}
     px(X+1,Y+1,3,1,P.yl2);px(X+4,Y+1,3,1,P.n);px(X+9,Y+1,3,1,P.yl2);px(X+12,Y+1,3,1,P.n);
     px(X+2,Y+8,2,4,ML);px(X+12,Y+8,2,4,ML);
@@ -253,8 +260,15 @@ function paintTile(x,y){
   } else if(c==='B'){
     box(X+1,Y+1,14,14,P.br2,P.br5);px(X+2,Y+2,12,2,P.br1);
     px(X+3,Y+7,10,1,P.br4);px(X+7,Y+2,2,12,P.br4);
-    px(X+4,Y+9,8,4,P.yl4);txt('?',X+6,Y+8,P.yl1,1);
-    px(X+2,Y+13,12,1,P.br5);
+    px(X+4,Y+9,8,4,P.yl4);txt('?',X+6,Y+8,P.yl1,1);px(X+2,Y+13,12,1,P.br5);
+  } else if(c==='d'){
+    px(X+7,Y+6,3,10,TK);px(X+7,Y+6,1,10,TKH);
+    ell(X+8,Y+4,6,4,TR);ell(X+6,Y+2,5,3,TR);ell(X+10,Y+2,5,3,TR);
+    ell(X+8,Y+1,4,3,TRH);ell(X+5,Y+4,3,2,TRL);ell(X+11,Y+4,3,2,TRL);
+    px(X+4,Y+14,2,2,GT);px(X+11,Y+14,2,2,GT);
+  } else if(c==='h'){
+    ell(X+8,Y+12,8,5,HL);ell(X+6,Y+10,5,3,HLH);ell(X+11,Y+11,4,3,HLL);
+    px(X+3,Y+8,2,3,GT);px(X+8,Y+7,2,4,GT);px(X+12,Y+8,2,3,GT);
   } else if(c==='%'){
     px(X,Y,TS,TS,ML);
     for(let i=0;i<4;i++){px(X,Y+i*4,TS,2,MT);px(X,Y+i*4+2,TS,1,RO);}
@@ -469,6 +483,7 @@ function updPlayer(){
   setProne(p,!!(K.down&&!K.up&&p.onGround&&p.dashT<=0));
   setCrouch(p,!!(K.down&&!K.up&&!p.onGround===false&&p.onGround&&p.dashT<=0&&!K.left&&!K.right));
   p.aim=aimOf(p);
+  p.aimKey=GFX.aimKey(p.aim);
 
   /* перенос движущейся платформой */
   if(p.groundMover&&!p.groundMover.dead){
@@ -1172,37 +1187,27 @@ function runAtk(b,pcx,pcy,sp){
 
 /* ═════════ РЕНДЕР ИГРОКА ═════════ */
 function drawChar(p,alpha){
-  const left=p.face<0;
-  let fr=0;
-  if(p.body==='run')fr=p.fr;
-  else if(p.body==='idle')fr=(p.breath|0)%2;
-  const spr=GFX.bodySprite(p.ch.id,p.body,fr,left);
+  const pose=GFX.poseOf(p);
+  const spr=GFX.player(p.ch.id,pose,p.face<0);
   if(!spr)return;
   if(p.inv>0&&(tick>>2)%2)return;
   const ix=lerp(p.px,p.x,alpha),iy=lerp(p.py,p.y,alpha);
   const cx=Math.round(ix-cam.x+p.w/2),feet=Math.round(iy+p.h);
-  const bob=p.landT>0?2:0;
-  g.drawImage(spr,cx-(GFX.CW>>1),feet-(p.prone?14:GFX.CH)+bob);
-  /* передняя рука + ствол */
-  if(!p.prone){
-    const ak=GFX.aimKey(p.aim);
-    const sh={x:cx+(left?-1:1)*1,y:feet-GFX.CH+GFX.SHY-BY_FIX()};
-    const pal=p.ch.id==='antony'?GFX_PAL(0):GFX_PAL(CHARS.indexOf(p.ch));
-    const tip=GFX.armDraw(g,sh.x,sh.y,ak,pal,p.recoil,p.weapon);
-    if(p.muzzle>0){
-      glow(tip.x,tip.y,12,'rgba(255,225,140,.9)',.85);
-      ell(tip.x,tip.y,4,4,P.fl1);ell(tip.x,tip.y,2,2,P.w);}
-  } else {
-    const mx=cx+p.face*20,my=feet-7;
-    if(p.muzzle>0){glow(mx,my,12,'rgba(255,225,140,.9)',.85);ell(mx,my,4,4,P.fl1);}
+  const bob=p.landT>0?1:0;
+  const dx=cx-9,dy=feet-spr.height+bob;
+  g.drawImage(spr,dx,dy);
+  if(p.muzzle>0){
+    const t=GFX.tip(pose,p.face<0,cx,feet-13);
+    glow(t.x,t.y,11,'rgba(255,225,140,.9)',.85);
+    ell(t.x,t.y,3.5,3.5,P.fl1);ell(t.x,t.y,1.6,1.6,P.w);
   }
-  if(p.dashT>0)glow(cx,iy+12,22,'rgba(53,224,255,.45)',.6);
+  if(p.dashT>0)glow(cx,iy+12,20,'rgba(53,224,255,.45)',.6);
   if(p.webT>0)for(let i=0;i<5;i++)beam(cx-8+i*4,iy+2,cx-6+i*4,iy+p.h,'rgba(255,255,255,.45)',1);
   if(p.drone){
-    const dx=p.drone.x-cam.x,dy=p.drone.y;
-    ellO(dx,dy,6,3,P.mt2,P.n);px(dx-2,dy-1,4,2,P.cy2);
-    px(dx-8,dy-3,3,1,P.mt1);px(dx+5,dy-3,3,1,P.mt1);
-    glow(dx,dy,10,'rgba(53,224,255,.4)',.55);}
+    const ddx=p.drone.x-cam.x,ddy=p.drone.y;
+    ellO(ddx,ddy,6,3,P.mt2,P.n);px(ddx-2,ddy-1,4,2,P.cy2);
+    px(ddx-8,ddy-3,3,1,P.mt1);px(ddx+5,ddy-3,3,1,P.mt1);
+    glow(ddx,ddy,10,'rgba(53,224,255,.4)',.55);}
 }
 function BY_FIX(){return 9;}
 const PALCACHE={};
@@ -1214,14 +1219,13 @@ function GFX_PAL(i){
   PALCACHE[i]=o;return o;
 }
 function drawFoe(f,alpha){
-  const left=f.face<0;
   let frame=0;
   if(f.def.kind==='ground'){
-    if(f.hide>0||f.crouch)frame=3;
+    if(f.hide>0||f.crouch)frame=0;
     else if(f.moving)frame=1+((f.anim|0)%2);
     else frame=0;
   } else frame=(f.anim|0)%2;
-  const spr=GFX.foe(f.def.spr||f.type,f.v,frame,left);
+  const spr=GFX.foe(f.def.spr||f.type,f.v,frame,f.face<0);
   if(!spr)return;
   const ix=lerp(f.px,f.x,alpha),iy=lerp(f.py,f.y,alpha);
   const cx=Math.round(ix-cam.x+f.w/2),feet=Math.round(iy+f.h);
@@ -1232,20 +1236,18 @@ function drawFoe(f,alpha){
   g.globalAlpha=1;
   if(flashOn){g.globalCompositeOperation='lighter';g.globalAlpha=.4;
     g.drawImage(spr,dx,dy);g.globalAlpha=1;g.globalCompositeOperation='source-over';}
-  /* канат */
   if(f.rope>0){beam(cx,0,cx,dy+4,'#c8b088',2);
     for(let k=0;k<3;k++)px(cx-2,dy+8+k*8,4,2,'#8a7050');}
-  /* ствол врага + вспышка */
   if(f.def.kind==='ground'&&f.rope<=0&&f.hide<=0){
-    const gy=dy+spr.height*.42,gx=cx+f.face*(spr.width/2);
-    beam(gx,gy,gx+f.face*12,gy+(f.aimA?Math.sin(f.aimA)*6:0),'#2c3648',3);
-    beam(gx,gy,gx+f.face*12,gy+(f.aimA?Math.sin(f.aimA)*6:0),'#5b6a80',1.6);
-    if(f.muzzle>0){glow(gx+f.face*13,gy,9,'rgba(255,225,140,.85)',.8);
-      ell(gx+f.face*13,gy,3,3,P.fl1);}
+    const gy=dy+11,gx=cx+f.face*6;
+    beam(gx,gy,gx+f.face*11,gy+(f.aimA?Math.sin(f.aimA)*5:0),'#242c3a',3);
+    beam(gx,gy,gx+f.face*11,gy+(f.aimA?Math.sin(f.aimA)*5:0),'#5b6a80',1.5);
+    if(f.muzzle>0){glow(gx+f.face*12,gy,8,'rgba(255,225,140,.85)',.8);
+      ell(gx+f.face*12,gy,2.5,2.5,P.fl1);}
   }
   if(f.type==='sniper'&&f.charge>0){
     const al=(32-f.charge)/32,a=f.aimA||0;
-    beam(cx+Math.cos(a)*12,iy+10+Math.sin(a)*12,
+    beam(cx+Math.cos(a)*10,iy+10+Math.sin(a)*10,
          cx+Math.cos(a)*440,iy+10+Math.sin(a)*440,'rgba(255,74,61,'+(al*.55).toFixed(2)+')',1);}
   if(f.type==='bunker'){
     px(dx-4,feet-8,spr.width+8,8,'#5a4a30');
