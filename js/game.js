@@ -1,15 +1,14 @@
 (() => {
 'use strict';
 
-// Проверка доступности ядра
 if (typeof CORE === 'undefined') {
-  document.body.innerHTML = '<div style="color:red;padding:20px;font-family:monospace;">ERROR: core.js not loaded!</div>';
+  console.error('CORE is missing');
   return;
 }
 
 const C = CORE;
 const {W,H,TS,P,clamp,rnd,ri,sgn,lerp,bind,px,box,ell,ellO,line,limb,tri,dith,vgrad,txt,txtC,tw,txtSh,txtCSh,SND,IN}=C;
-const DATA_REF = typeof DATA !== 'undefined' ? DATA : { CHARS:['antony'], WEAPONS:[{}] , ENEMIES:{}, BOSSES:{}, LEVELS:[{w:50,h:15,name:'START',rows:[]}], THEMES:{jungle:{sky:'#05070d',rock:'#22304a'}} };
+const DATA_REF = typeof DATA !== 'undefined' ? DATA : { CHARS:[{id:'antony'}], WEAPONS:[{}] , ENEMIES:{}, BOSSES:{}, LEVELS:[{w:50,h:16,name:'START',rows:[]}], THEMES:{jungle:{sky:['#05070d','#131c33'],rock:'#22304a'}} };
 const {CHARS,WEAPONS,WORDER,ENEMIES,BOSSES,LEVELS,THEMES}=DATA_REF;
 
 const col=(c,f)=>(typeof c==='string'&&c)?c:f;
@@ -51,7 +50,8 @@ const T=(x,y)=>{
 const sol=(x,y)=>T(x,y)==='#';
 
 const layers=new Map();
-function layer(key,w,h,fn){let c=layers.get(key);if(c)return c;
+function layer(key,w,h,fn){
+  let c=layers.get(key);if(c)return c;
   c=document.createElement('canvas');c.width=w;c.height=h;const old=g;
   try{bind(c.getContext('2d'));fn();}finally{bind(old);}layers.set(key,c);return c;
 }
@@ -66,8 +66,8 @@ function paintTile(x,y){
 
 function initLevel(index){
   si=clamp(index,0,(LEVELS?.length||1)-1);
-  lvl=LEVELS?.[si] || {w:60,h:15,name:'ZONE 1',rows:Array(15).fill('#'.repeat(60))};
-  th=THEMES?.[lvl.theme||'jungle'] || {sky:'#05070d',rock:'#22304a'};
+  lvl=LEVELS?.[si] || {w:60,h:16,name:'ZONE 1',rows:Array(16).fill('#'.repeat(60))};
+  th=THEMES?.[lvl.theme||'jungle'] || {sky:['#05070d','#131c33'],rock:'#22304a'};
   
   layers.clear();
   tileCv=layer('tile_'+si,lvl.w*TS,lvl.h*TS,()=>{
@@ -110,19 +110,18 @@ function update(){
 }
 
 function render(){
-  g.fillStyle=th?.sky||'#05070d';
+  g.fillStyle=Array.isArray(th?.sky)?th.sky[0]:(th?.sky||'#05070d');
   g.fillRect(0,0,W,H);
 
   if(tileCv){
     g.drawImage(tileCv,cam.x|0,0,W,H,0,0,W,H);
   }
 
-  // Рендер игрока через GFX если доступен, иначе запасной прямоугольник
   if(pl){
     let drawn=false;
     if(typeof GFX!=='undefined'&&GFX.ready&&GFX.player){
       const pose=GFX.poseOf?GFX.poseOf(pl):'idle';
-      const spr=GFX.player(CHARS[si%CHARS.length]||'antony',pose,pl.dir<0);
+      const spr=GFX.player(CHARS[si%CHARS.length]?.id||'antony',pose,pl.dir<0);
       if(spr){g.drawImage(spr,(pl.x-cam.x)|0,pl.y|0);drawn=true;}
     }
     if(!drawn){
